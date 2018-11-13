@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:id="@+id/basics"
+                style="@style/SectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Basics..." />
+
+            <Button
+                android:id="@+id/movingnodes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/ExampleButton"
+                android:text="Moving nodes" />
+
+            <Button
+                android:id="@+id/mobilebroadcastnodes"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mobile broadcasting nodes" />
+
+            <Button
+                android:id="@+id/broadcastingnodes"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Broadcasting nodes" />
+
+            <Button
+                android:id="@+id/spanningtreenodes"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Spanning Tree nodes" />
+
+            <TextView
+                android:id="@+id/funny"
+                style="@style/SectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Funny..." />
+
+            <Button
+                android:id="@+id/cowboy"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cowboy" />
+
+            <Button
+                android:id="@+id/soccer"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Soccer" />
+
+            <Button
+                android:id="@+id/wolfsheep"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Wolf &amp; Sheep" />
+
+            <TextView
+                android:id="@+id/fancy"
+                style="@style/SectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fancy..." />
+
+            <Button
+                android:id="@+id/angularforces"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Angular Forces" />
+
+            <Button
+                android:id="@+id/canadairs"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Canadairs" />
+
+            <Button
+                android:id="@+id/vectorracer"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Vector Racer" />
+
+            <Button
+                android:id="@+id/parkcleaning"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Park Cleaning" />
+
+            <TextView
+                android:id="@+id/misc"
+                style="@style/SectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Miscellaneous..." />
+
+            <Button
+                android:id="@+id/spanningforest"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Spanning Forest" />
+
+            <Button
+                android:id="@+id/randomwalk"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Random walk" />
+
+            <TextView
+                android:id="@+id/mobilitymodels"
+                style="@style/SectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mobility models" />
+
+            <Button
+                android:id="@+id/circlemovement"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Circular Movement" />
+
+            <Button
+                android:id="@+id/davidnode"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="David's nodes" />
+
+            <Button
+                android:id="@+id/globalrwp"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Global Random Waypoint" />
+
+            <Button
+                android:id="@+id/simplehighway"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simple Highway" />
+
+            <Button
+                android:id="@+id/wpbasic"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Basic Waypoint Node" />
+
+            <Button
+                android:id="@+id/wpmeeting"
+                style="@style/ExampleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Meeting Waypoint Node" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
