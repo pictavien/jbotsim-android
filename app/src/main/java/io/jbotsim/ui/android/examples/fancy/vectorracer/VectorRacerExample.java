@@ -2,6 +2,9 @@ package io.jbotsim.ui.android.examples.fancy.vectorracer;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+
 import io.jbotsim.core.Node;
 import io.jbotsim.core.Topology;
 import io.jbotsim.core.event.ClockListener;
@@ -52,6 +55,7 @@ public class VectorRacerExample implements ClockListener, BackgroundPainter, Vie
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void paintBackground(Canvas canvas, Topology topology) {
         VectorNode drone = null;

@@ -3,6 +3,9 @@ package io.jbotsim.ui.android.examples.funny.soccer;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+
 import io.jbotsim.ui.android.ViewerActivityInitializer;
 import io.jbotsim.core.Topology;
 import io.jbotsim.ui.android.AndroidViewerActivity;
@@ -22,6 +25,7 @@ public class SoccerExample implements  BackgroundPainter, ViewerActivityInitiali
         return true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void paintBackground(Canvas canvas, Topology topology) {
         Paint pt = new Paint();
