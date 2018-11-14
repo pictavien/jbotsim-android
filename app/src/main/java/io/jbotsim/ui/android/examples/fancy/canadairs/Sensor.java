@@ -21,6 +21,7 @@ public class Sensor extends Node {
         setSize(16);
         setCommunicationRange(120);
         setSensingRange(60);
+        onStart();
     }
 
     @Override
