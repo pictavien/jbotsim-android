@@ -26,12 +26,11 @@ public class VectorRacerExample implements ClockListener, BackgroundPainter, Vie
         tp = activity.getTopology();
         startPoint = new Point(tp.getWidth() / 2, tp.getHeight() / 2);
         tp.addClockListener(this);
-        activity.getViewer().getView().addBackgroundPainter(this);
+        activity.getViewer().addBackgroundPainter(this);
 
         tp.setClockSpeed(10);
         CherrySets.distribute(tp);
         tp.addNode(5 * tp.getWidth() / 8, 4 * tp.getHeight() / 6, new Drone());
-        tp.start();
 
         return true;
     }

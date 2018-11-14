@@ -9,20 +9,31 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.util.DisplayMetrics;
 import android.view.*;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import io.jbotsim.core.Topology;
 import org.json.JSONException;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import static io.jbotsim.ui.android.R.*;
+import io.jbotsim.ui.android.event.CommandListener;
 
 public class AndroidViewerActivity extends Activity {
     private Topology topology;
     private AndroidTopologyViewer controller;
     private volatile boolean saveOnExit = false;
+    protected ArrayList<CommandListener> commandListeners = new ArrayList<>();
+    protected ArrayList<String> commands = new ArrayList<String>();
 
     public AndroidViewerActivity() {
         this(new Topology());
@@ -51,9 +62,68 @@ public class AndroidViewerActivity extends Activity {
 //        int height = displaymetrics.heightPixels;
 //        int width = displaymetrics.widthPixels;
 
-        controller = new AndroidTopologyViewer(this,topology);
+        setContentView(R.layout.topology_viewer);
 
-        setContentView(controller.getView());
+        controller = findViewById(R.id.topologyview);
+        controller.setTopology(topology);
+
+        Button startButton = findViewById(R.id.startbutton);
+        final Button resetButton = findViewById(R.id.resetbutton);
+        final Button stepButton = findViewById(R.id.stepbutton);
+        resetButton.setVisibility(View.GONE);
+        stepButton.setVisibility(View.GONE);
+
+        addCommand("Com 1");
+        addCommand("Com 2");
+        addCommand("Com 3");
+
+        if (topology.isStarted()) {
+            startButton.setText(R.string.pause);
+        } else {
+            startButton.setText(R.string.start);
+        }
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Button b = (Button) v;
+                Topology tp = controller.getTopology();
+
+                if(tp.isRunning()) {
+                    tp.pause();
+                    b.setText(R.string.resume);
+                    resetButton.setVisibility(View.VISIBLE);
+                    stepButton.setVisibility(View.VISIBLE);
+                } else {
+                    ((Button) v).setText(R.string.pause);
+                    if (tp.isStarted())
+                        tp.resume();
+                    else
+                        tp.start();
+                    resetButton.setVisibility(View.GONE);
+                    stepButton.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        findViewById(R.id.stepbutton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Topology tp = getTopology();
+
+                if(!tp.isRunning() && tp.isStarted())
+                    tp.step();
+            }
+        });
+
+        findViewById(R.id.stepbutton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Topology tp = getTopology();
+
+                if(!tp.isRunning() && tp.isStarted())
+                    tp.step();
+            }
+        });
 
         AndroidTopologyViewer.EDGE_DRAW_MODE = false;
 
@@ -87,12 +157,12 @@ public class AndroidViewerActivity extends Activity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        controller.getView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        controller.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                controller.getView().getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                int height = controller.getView().getHeight();
-                int width = controller.getView().getWidth();
+                controller.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int height = controller.getHeight();
+                int width = controller.getWidth();
                 topology.setDimensions(width, height);
 
                 try {
@@ -112,7 +182,7 @@ public class AndroidViewerActivity extends Activity {
                     e.printStackTrace();
                 }
 
-                getTopology().start();
+                //getTopology().start();
             }
         });
     }
@@ -128,6 +198,29 @@ public class AndroidViewerActivity extends Activity {
         return true;
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem mi = menu.findItem(R.id.commandmenu);
+        Menu commandsMenu = mi.getSubMenu();
+        commandsMenu.clear();
+        for(String c : commands) {
+            MenuItem mic = commandsMenu.add(c);
+            mic.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    notifyCommandListeners(item.getTitle().toString());
+                    return true;
+                }
+            });
+        }
+        return true;
+    }
+
+    protected void notifyCommandListeners(String command) {
+        for(CommandListener cl : commandListeners) {
+            cl.onCommand(command);
+        }
+    }
     /**
      * returns a string containing date and graph info
      */
@@ -182,95 +275,18 @@ public class AndroidViewerActivity extends Activity {
         // System.out.println();
 
         int i = item.getItemId();
-        if (i == id.finish) {
+        if (i == R.id.quit) {
             saveOnExit = false;
             finish();
             return true;
-        } else if (i == id.finish_and_save) {
-            saveOnExit = true;
-            finish();
-            return true;
-        } else if (i == id.new_graph) {
-            return true;
-        } else if (i == id.clear_colours) {
-            controller.clearAll();
-            return true;
-        } else if (i == id.centralize) {
-            controller.centralize();
-            return true;
-        } else if (i == id.snap || i == id.threshold || i == id.compute_maximum_independent_set ||
-                i == id.compute_chromatic_number || i == id.compute_colouring ||
-                i == id.compute_maximum_clique || i == id.vertex_integrity ||
-                i == id.compute_minimal_triangulation || i == id.compute_steiner_tree ||
-                i == id.compute_treewidth || i == id.compute_simplicial_vertices ||
-                i == id.compute_chordality || i == id.compute_claw_deletion
-                || i == id.compute_perfect_code || i == id.compute_claws || i == id.compute_cycle_4
-                || i == id.compute_regularity_deletion_set || i == id.compute_odd_cycle_transversal
-                || i == id.compute_feedback_vertex_set
-                || i == id.compute_connected_feedback_vertex_set || i == id.compute_vertex_cover
-                || i == id.compute_connected_vertex_cover || i == id.compute_minimum_dominating_set
-                || i == id.spring || i == id.hamiltonian_path || i == id.hamiltonian_cycle
-                || i == id.flow || i == id.path || i == id.power || i == id.compute_mst
-                || i == id.compute_balanced_separator || i == id.compute_diameter
-                || i == id.compute_girth || i == id.bipartition || i == id.compute_all_cuts
-                || i == id.compute_all_bridges || i == id.test_eulerian || i == id.show_center
-                || i == id.add_universal_vertex || i == id.compute_bandwidth
-                || i == id.metapost_to_clipboard || i == id.tikz_to_clipboard
-                || i == id.share_tikz || i == id.share_interval || i == id.interval
-                || i == id.share_metapost || i == id.graph_complement || i == id.local_complement
-                || i == id.contract || i == id.complement_selected) {
-            return true;
-        } else if (i == id.select_all) {
-            controller.selectAll();
-            return true;
-        } else if (i == id.deselect_all) {
-            controller.deselectAll();
-            return true;
-        } else if (i == id.select_all_highlighted_vertices) {
-            return true;
-        } else if (i == id.invert_selected) {
-            controller.invertSelectedVertices();
-            return true;
-        } else if (i == id.select_reachable) {
-            return true;
-        } else if (i == id.complete_selected) {
-            return true;
-        } else if (i == id.delete_selected) {
-            int deleted = controller.deleteSelectedVertices();
-            if (deleted == 0) {
-                shortToast("No vertices selected");
-            } else {
-                shortToast("Deleted " + deleted + " vertices");
-            }
-            return true;
-        } else if (i == id.induce_subgraph) {
-            return true;
-        } else if (i == id.toggle_edge_edit) {
-            boolean edgedraw = controller.toggleEdgeDraw();
-            shortToast(edgedraw ? "Edge draw mode" : "Vertex move mode");
-            return true;
-        } else if (i == id.save) {
+        } else if (i == R.id.save) {
             save();
             return true;
-        } else if (i == id.load) {
+        } else if (i == R.id.load) {
             load();
             return true;
-        } else if (i == id.delete) {
-            delete();
-            return true;
-        } else if (i == id.toggle_label_drawing) {
-            boolean doShow = !AndroidTopologyViewer.DO_SHOW_LABELS;
-            AndroidTopologyViewer.DO_SHOW_LABELS = doShow;
-            if (doShow)
-                shortToast("Showing labels");
-            else
-                shortToast("Not showing labels");
-            controller.redraw();
-            return true;
-        } else {
-            System.out.println("Option item selected, " + item.getTitle());
-            return super.onOptionsItemSelected(item);
         }
+        return super.onOptionsItemSelected(item);
     }
 
     public void save() {
@@ -387,5 +403,53 @@ public class AndroidViewerActivity extends Activity {
         alert.show();
 
     }
+
+    /**
+     * Registers the specified action listener to this JTopology.
+     *
+     * @param al The listener to add.
+     */
+    public void addCommandListener(CommandListener al) {
+        commandListeners.add(al);
+    }
+
+    /**
+     * Unregisters the specified action listener to this JTopology.
+     *
+     * @param al The listener to remove.
+     */
+    public void removeCommandListener(CommandListener al) {
+        commandListeners.remove(al);
+    }
+
+    /**
+     * Adds the specified action command to this JTopology.
+     *
+     * @param command The command name to add.
+     */
+    public void addCommand(String command) {
+        commands.add(command);
+    }
+
+    public List<String> getCommands() {
+        return commands.subList(0, commands.size() - 1);
+    }
+
+    /**
+     * Removes the specified action command from this JTopology.
+     *
+     * @param command The command name to remove.
+     */
+    public void removeCommand(String command) {
+        commands.remove(command);
+    }
+
+    /**
+     * Removes all commands from this JTopology.
+     */
+    public void removeAllCommands() {
+        commands.clear();
+    }
+
 
 }

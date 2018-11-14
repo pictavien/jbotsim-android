@@ -54,7 +54,7 @@ public class CowboyExample implements ClockListener, BackgroundPainter, ViewerAc
         tp.addNode(-1, -1, new Cow());
         tp.addNode(-1,-1, new Cow());
         tp.addNode(-1,-1, new Cow());
-        activity.getViewer().getView().addBackgroundPainter(this);
+        activity.getViewer().addBackgroundPainter(this);
 
         return true;
     }

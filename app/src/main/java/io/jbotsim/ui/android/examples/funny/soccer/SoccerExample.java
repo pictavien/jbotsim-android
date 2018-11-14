@@ -21,7 +21,7 @@ public class SoccerExample implements  BackgroundPainter, ViewerActivityInitiali
         tp.setClockSpeed(50);
         tp.addNode(100, 100, new Ball());
         tp.setDefaultNodeModel(Robot.class);
-        activity.getViewer().getView().addBackgroundPainter(this);
+        activity.getViewer().addBackgroundPainter(this);
         return true;
     }
 
