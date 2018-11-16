@@ -9,13 +9,17 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.*;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.widget.*;
-import io.jbotsim.core.*;
+
+import io.jbotsim.core.Link;
+import io.jbotsim.core.Node;
+import io.jbotsim.core.Topology;
+import io.jbotsim.core._Properties;
 import io.jbotsim.core.event.*;
-import io.jbotsim.ui.android.event.CommandListener;
 import io.jbotsim.ui.android.painting.BackgroundPainter;
 import io.jbotsim.ui.android.painting.DefaultBackgroundPainter;
 import io.jbotsim.ui.android.painting.DefaultLinkPainter;
@@ -23,14 +27,19 @@ import io.jbotsim.ui.android.painting.DefaultNodePainter;
 import io.jbotsim.ui.android.painting.LinkPainter;
 import io.jbotsim.ui.android.painting.NodePainter;
 
+import android.graphics.Color;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.Inflater;
 
 
-public class AndroidTopologyViewer extends View {
+public class AndroidTopologyViewer
+        extends View
+        implements TopologyListener, MovementListener,
+                   ConnectivityListener, PropertyListener,
+                   ClockListener {
     // TODO this should depend on screen size and or zoom (scale of matrix)
     public final static float USER_MISS_RADIUS = 10;
     /**
@@ -41,27 +50,27 @@ public class AndroidTopologyViewer extends View {
      * true if the labels should be drawn or not
      */
     public static boolean EDGE_DRAW_MODE = true;
-    public static int TRASH_CAN = 0;
+    public static final int BACKGROUND_COLOR = Color.LTGRAY;
+
     private static Bitmap defaultNodeIcon = null;
-    //private AndroidViewerActivity activity;
-    private String info = "";
+    private String statusInfo = "";
     private Set<Node> userSelectedVertices = new HashSet<>();
     private Set<Link> markedEdges = new HashSet<>();
     private Node deleteVertex = null;
-    private final Bitmap trashBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.trash64x64);
-    private final Bitmap trashRedBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.trash_red64x64);
-    private final Bitmap trashBgRedBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.red_bg);
-    private final Paint trashPaint = new Paint();
     protected ArrayList<BackgroundPainter> backgroundPainters = new ArrayList<>();
     protected LinkPainter linkPainter;
     protected ArrayList<NodePainter> nodePainters = new ArrayList<>();
     protected boolean showDrawings = true;
     private Topology tp;
-    private Matrix transformMatrix = new Matrix();
-    private boolean trashCoordinatesSet = false;
-    private int trashX = -1;
-    private int trashY = -1;
+    private Matrix transformMatrix = null;
+
+    private DeleteIcon deleteIcon = null;
+
     private EventHandler evh;
+
+    private Integer initialWidth = null;
+    private Integer initialHeight = null;
+
 
     public AndroidTopologyViewer(Context context) {
         this(context, null);
@@ -84,21 +93,24 @@ public class AndroidTopologyViewer extends View {
     public void setTopology(Topology topology) {
         unsetTopology();
         if ((tp = topology) != null) {
-            tp.addConnectivityListener(evh);
-            tp.addTopologyListener(evh);
-            tp.addMovementListener(evh);
-            tp.addPropertyListener(evh);
-            tp.addClockListener(evh);
+            tp.addConnectivityListener(this);
+            tp.addTopologyListener(this);
+            tp.addMovementListener(this);
+            tp.addPropertyListener(this);
+            tp.addClockListener(this);
         }
     }
+
     private void unsetTopology() {
         if (tp == null)
             return;
-        tp.removeClockListener(evh);
-        tp.removePropertyListener(evh);
-        tp.removeMovementListener(evh);
-        tp.removeTopologyListener(evh);
-        tp.removeConnectivityListener(evh);
+        tp.removeClockListener(this);
+        tp.removePropertyListener(this);
+        tp.removeMovementListener(this);
+        tp.removeTopologyListener(this);
+        tp.removeConnectivityListener(this);
+        initialHeight = null;
+        initialWidth = null;
         tp = null;
     }
 
@@ -117,18 +129,9 @@ public class AndroidTopologyViewer extends View {
         return tp;
     }
 
-    public void clearMemory() {
-        // TODO something
-    }
-
     public void setEdgeDrawMode(boolean mode) {
         if (EDGE_DRAW_MODE != mode)
             toggleEdgeDraw();
-    }
-
-    public void trashCan(int mode) {
-        TRASH_CAN = mode;
-        redraw();
     }
 
     /**
@@ -143,7 +146,7 @@ public class AndroidTopologyViewer extends View {
      * @param radius
      * @return the vertex closest to coordinate constrained to radius, or null
      */
-    public Node getClosestVertex(Coordinate coordinate, double radius) {
+    public Node getClosestVertex(Point coordinate, double radius) {
         List<Node> vertices = getTopology().getNodes();
         if (vertices.isEmpty())
             return null;
@@ -152,7 +155,7 @@ public class AndroidTopologyViewer extends View {
         Node bestVertex = null;
 
         for (Node currentVertex : vertices) {
-            Point pos = currentVertex.getLocation();
+            io.jbotsim.core.Point pos = currentVertex.getLocation();
             double currentDistance = pos.distance(coordinate.getX(), coordinate.getY());
             if (currentDistance < bestDistance) {
                 bestVertex = currentVertex;
@@ -254,48 +257,6 @@ public class AndroidTopologyViewer extends View {
         // TODO
     }
 
-    public String makeInfo() {
-        return info;
-    }
-
-    public String graphInfo() {
-        return info;
-    }
-
-    public void redraw() {
-		/*
-		if (graph == null) {
-			return;
-		}
-
-		for (DefaultVertex v : graph.vertexSet()) {
-			v.setLabel(""); // todo fix
-		}
-		for (DefaultEdge<DefaultVertex> e : graph.edgeSet()) {
-			e.setStyle(EdgeStyle.SOLID); // todo fix
-		}
-
-		for (DefaultVertex v : graph.vertexSet()) {
-			v.setColor(EDGE_DRAW_MODE ? DEFAULT_VERTEX_COLOR : TOUCHED_VERTEX_COLOR);
-		}
-
-		for (DefaultVertex v : graph.vertexSet()) {
-			v.setColor(EDGE_DRAW_MODE ? DEFAULT_VERTEX_COLOR : TOUCHED_VERTEX_COLOR);
-			if (userSelectedVertices.contains(v)) {
-				v.setColor(USERSELECTED_VERTEX_COLOR);
-			}
-		}
-
-		for (DefaultEdge<DefaultVertex> e : graph.edgeSet()) {
-			e.setColor(DEFAULT_EDGE_COLOR);
-			if (markedEdges.contains(e)) {
-				e.setStyle(EdgeStyle.BOLD);
-			}
-		}
-*/
-        redraw(graphInfo());
-    }
-
     public void addBackgroundPainter(BackgroundPainter painter) {
         backgroundPainters.add(0, painter);
     }
@@ -326,7 +287,7 @@ public class AndroidTopologyViewer extends View {
         nodePainters.remove(painter);
     }
 
-     /**
+    /**
      * Disables the drawing of links and sensing radius (if any).
      */
     public void disableDrawings() {
@@ -338,8 +299,8 @@ public class AndroidTopologyViewer extends View {
         return transformMatrix;
     }
 
-    public void redraw(String info) {
-        this.info = info;
+    public void redraw() {
+        updateStatus();
         invalidate();
     }
 
@@ -347,47 +308,66 @@ public class AndroidTopologyViewer extends View {
      * Returns the coordinate the given point/coordinate on the screen represents
      * in the graph
      */
-    public Coordinate translateCoordinate(Coordinate screenCoordinate) {
+    public Point translateCoordinate(Point screenCoordinate) {
         float[] screenPoint = {(float) screenCoordinate.getX(), (float) screenCoordinate.getY()};
         Matrix invertedTransformMatrix = new Matrix();
 
         getTransformMatrix().invert(invertedTransformMatrix);
         invertedTransformMatrix.mapPoints(screenPoint);
 
-        return new Coordinate(screenPoint[0], screenPoint[1]);
+        return new Point(screenPoint[0], screenPoint[1]);
     }
 
-    public boolean isOnTrashCan(Coordinate c) {
-        int x = (int) c.getX();
-        int y = (int) c.getY();
 
-        return (x >= trashX && x <= trashX + trashBitmap.getWidth() && y >= trashY && y <= trashY + trashBitmap.getHeight());
+    void saveInitialTopologyDimensions() {
+        if (initialWidth == null || initialHeight == null) {
+            initialWidth = tp.getWidth();
+            initialHeight = tp.getHeight();
+        }
+    }
+
+    public void resetTopologySize() {
+        saveInitialTopologyDimensions();
+        resizeTopology(initialWidth, initialHeight);
+    }
+
+    public void resizeTopologyToScreen() {
+        saveInitialTopologyDimensions();
+        resizeTopology(getWidth(), getHeight());
+    }
+
+    private void resizeTopology(int width, int height) {
+        tp.setDimensions(width, height);
+        RectF src = new RectF(0.0f, 0.0f, width, height);
+        RectF dst = new RectF(0.0f, 0.0f, getWidth(), getHeight());
+        transformMatrix = new Matrix();
+        transformMatrix.setRectToRect(src, dst, Matrix.ScaleToFit.CENTER);
+        redraw();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        /** TODO fix scaling of topology.
-         *  It makes problems for the selection of nodes.
-         *
-         if (getWidth() != topology.getWidth() || getHeight() != topology.getHeight()) {
-         Matrix m = new Matrix();
-         RectF src = new RectF(0f, 0f, topology.getWidth(), topology.getHeight());
-         RectF dst = new RectF(0f, 0f, getWidth(), getHeight());
-         m.setRectToRect(src, dst, Matrix.ScaleToFit.CENTER);
-         canvas.concat(m);
-         }
-         */
-        assert (tp != null);
 
-        if (!trashCoordinatesSet) {
-            if (getWidth() > 0 && getHeight() > 0) {
-                trashX = (getWidth() - trashBitmap.getWidth()) / 2;
-                trashY = getHeight() - trashBitmap.getHeight() - 10;
-                trashCoordinatesSet = true;
-            }
+        if (transformMatrix == null) {
+            resetTopologySize();
         }
 
+        Paint paint = new Paint();
+        paint.setColor(BACKGROUND_COLOR);
+        canvas.drawRect(0.0f, 0.0f, canvas.getWidth(), canvas.getHeight(), paint);
+
+        if (deleteIcon == null) {
+            deleteIcon = new DeleteIcon(canvas.getWidth() / 2f, canvas.getHeight() * 0.90f);
+        }
+
+        canvas.save();
+        canvas.concat(transformMatrix);
+
+        paint.setColor(android.graphics.Color.WHITE);
+        canvas.drawRect(0.0f, 0.0f, tp.getWidth(), tp.getHeight(), paint);
+
+        assert (tp != null);
         setBackgroundColor(android.graphics.Color.WHITE);
 
         for (BackgroundPainter bp : backgroundPainters) {
@@ -403,28 +383,86 @@ public class AndroidTopologyViewer extends View {
         for (Link link : tp.getLinks()) {
             linkPainter.paintLink(canvas, link);
         }
-        displayTrash(canvas);
-        writeInfo(canvas);
+        canvas.restore();
+
+        deleteIcon.draw(canvas);
+        writeStatus(canvas);
     }
 
-    private void displayTrash(Canvas canvas) {
-        if (AndroidTopologyViewer.TRASH_CAN == 1) {
-            canvas.drawBitmap(trashBitmap, trashX, trashY, trashPaint);
-        } else if (AndroidTopologyViewer.TRASH_CAN == 2) {
-            canvas.drawBitmap(trashBgRedBitmap, trashX - 46, trashY - 46, trashPaint);
-            canvas.drawBitmap(trashRedBitmap, trashX, trashY, trashPaint);
+    public void updateStatus() {
+        statusInfo = "# node : " + tp.getNodes().size() + "# nb links: " + tp.getLinks().size() +
+                "# time: " + tp.getTime();
+    }
+
+    private void writeStatus(Canvas canvas) {
+        Paint textPaint = new Paint();
+        textPaint.setColor(android.graphics.Color.BLACK);
+        Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
+        canvas.drawText(statusInfo,0, -fontMetrics.top, textPaint);
+    }
+
+    public void onNodeAdded(Node n) {
+        n.addPropertyListener(this);
+        if (n.getIcon() == null)
+            n.setProperty("icon-bitmap", defaultNodeIcon);
+        else
+            n.setProperty("icon", n.getIcon());
+        redraw();
+    }
+
+    public void onNodeRemoved(Node n) {
+        redraw();
+    }
+
+    public void onLinkAdded(Link l) {
+        l.addPropertyListener(this);
+        redraw();
+    }
+
+    public void onLinkRemoved(Link l) {
+        redraw();
+    }
+
+    public void onMove(Node n) {
+        redraw();
+    }
+
+    public void propertyChanged(_Properties o, String property) {
+        if (o instanceof Node) {
+            Node n = (Node) o;
+            redraw();
+				/*if (property.equals("color")) {
+					jn.updateUI();
+				} else  else if (property.equals("size")) {
+					jn.updateIcon();
+				} */
+            if (property.equals("icon")) {
+                Resources rsrc = getResources();
+                int id = rsrc.getIdentifier(n.getIcon(), "drawable", getContext().getPackageName());
+                Bitmap icon = BitmapFactory.decodeResource(rsrc, id);
+                if (Node.DEFAULT_DIRECTION != 0.0) {
+                    Matrix mat = new Matrix();
+                    double degrees = -180.0 * Node.DEFAULT_DIRECTION / Math.PI;
+                    mat.setRotate((float) degrees);
+                    icon = Bitmap.createBitmap(icon, 0, 0, icon.getWidth(), icon.getHeight(), mat, true);
+                }
+                n.setProperty("icon-bitmap", icon);
+                redraw();
+            }
+        } else if (property.equals("width") || property.equals("color")) {
+            redraw();
         }
     }
 
-    private void writeInfo(Canvas canvas) {
-        Paint textPaint = new Paint();
-        textPaint.setColor(android.graphics.Color.BLACK);
-        canvas.drawText(info, 100, 100, textPaint);
+    @Override
+    public void onClock() {
     }
 
-    private class EventHandler extends SimpleOnGestureListener implements View.OnTouchListener, View.OnClickListener,
-            TopologyListener, MovementListener, ConnectivityListener,
-            PropertyListener, ClockListener {
+
+    private class EventHandler
+            extends SimpleOnGestureListener
+            implements View.OnTouchListener,
+                       View.OnClickListener {
         GestureDetector gd;
         /**
          * This vertex was touch, e.g. for scrolling and moving purposes
@@ -433,19 +471,19 @@ public class AndroidTopologyViewer extends View {
         /**
          * This is set to the coordinate of the vertex we started move
          */
-        private Coordinate startCoordinate = null;
+        private Point startCoordinate = null;
         private int previousPointerCount = 0;
-        private Coordinate[] previousPointerCoords = null;
+        private Point[] previousPointerCoords = null;
         private boolean popuprunning = false;
 
         public EventHandler() {
-            gd = new GestureDetector(this); // TODO deprecated!
+            gd = new GestureDetector(getContext(), this);
         }
 
         public boolean onDown(MotionEvent e) {
-            trashCan(0);
-            Coordinate sCoordinate = new Coordinate(e.getX(), e.getY());
-            Coordinate gCoordinate = translateCoordinate(sCoordinate);
+            deleteIcon.setVisible(false);
+            Point sCoordinate = new Point(e.getX(), e.getY());
+            Point gCoordinate = translateCoordinate(sCoordinate);
             previousPointerCount = -1; // make any ongoing scroll restart
 
             if (e.getPointerCount() == 1) {
@@ -456,19 +494,20 @@ public class AndroidTopologyViewer extends View {
             return super.onDown(e);
         }
 
-        public Coordinate clearCoordinate() {
-            Coordinate ret = startCoordinate;
+        public Point clearCoordinate() {
+            Point ret = startCoordinate;
             startCoordinate = null;
             return ret;
         }
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            trashCan(0);
-            Coordinate sCoordinate = new Coordinate(e2.getX(), e2.getY());
-            Coordinate gCoordinate = translateCoordinate(sCoordinate);
+            deleteIcon.setVisible(false);
+            Point sCoordinate = new Point(e2.getX(), e2.getY());
+            Point gCoordinate = translateCoordinate(sCoordinate);
             Node hit = getClosestVertex(gCoordinate, USER_MISS_RADIUS);
-            float dist = (float) Math.round(Math.sqrt((velocityX * velocityX) + (velocityY * velocityY)));
+            float dist = (float) Math.round(Math.sqrt((velocityX * velocityX) + (velocityY *
+                    velocityY)));
 
             if (dist < 4000)
                 return true;
@@ -485,7 +524,7 @@ public class AndroidTopologyViewer extends View {
         }
 
 
-        private void popupNodeClasses (final double x, final double y) {
+        private void popupNodeClasses(final double x, final double y) {
             if (popuprunning)
                 return;
 
@@ -500,7 +539,8 @@ public class AndroidTopologyViewer extends View {
             });
             ListView lv = (ListView) popupModels.findViewById(R.id.nodemodels_list);
             final List<String> models = new ArrayList<>(getTopology().getModelsNames());
-            ArrayAdapter<String> adapter = new ArrayAdapter(getContext(), R.layout.nodemodels_entry, models);
+            ArrayAdapter<String> adapter = new ArrayAdapter(getContext(), R.layout
+                    .nodemodels_entry, models);
             lv.setAdapter(adapter);
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -516,11 +556,11 @@ public class AndroidTopologyViewer extends View {
 
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
-            trashCan(0);
+            deleteIcon.setVisible(false);
             if (EDGE_DRAW_MODE) {
 
-                Coordinate sCoordinate = new Coordinate(e.getX(), e.getY());
-                Coordinate gCoordinate = translateCoordinate(sCoordinate);
+                Point sCoordinate = new Point(e.getX(), e.getY());
+                Point gCoordinate = translateCoordinate(sCoordinate);
                 Node hit = getClosestVertex(gCoordinate, USER_MISS_RADIUS);
 
                 if (hit == null) {
@@ -530,8 +570,8 @@ public class AndroidTopologyViewer extends View {
                     return true;
                 }
             } else {
-                Coordinate sCoordinate = new Coordinate(e.getX(), e.getY());
-                Coordinate gCoordinate = translateCoordinate(sCoordinate);
+                Point sCoordinate = new Point(e.getX(), e.getY());
+                Point gCoordinate = translateCoordinate(sCoordinate);
                 Node hit = getClosestVertex(gCoordinate, USER_MISS_RADIUS);
                 Topology tp = getTopology();
 
@@ -544,7 +584,8 @@ public class AndroidTopologyViewer extends View {
                     } else if (tp.getModelsNames().size() > 0) {
                         modelName = tp.getModelsNames().iterator().next();
                     }
-                    tp.addNode(gCoordinate.getX(), gCoordinate.getY(), tp.newInstanceOfModel(modelName));
+                    tp.addNode(gCoordinate.getX(), gCoordinate.getY(), tp.newInstanceOfModel
+                            (modelName));
                 } else {
                     if (userSelectedVertices.contains(hit)) {
                         userSelectedVertices.remove(hit);
@@ -562,8 +603,7 @@ public class AndroidTopologyViewer extends View {
         }
 
         public void onLongPress(MotionEvent e) {
-            trashCan(0);
-            //vibrator.vibrate(50);
+            deleteIcon.setVisible(false);
             toggleEdgeDraw();
         }
 
@@ -571,34 +611,37 @@ public class AndroidTopologyViewer extends View {
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             switch (e2.getPointerCount()) {
                 case 2:
-                    trashCan(0);
+                    deleteIcon.setVisible(false);
                     if (previousPointerCoords == null || previousPointerCount != 2) {
-                        previousPointerCoords = new Coordinate[2];
-                        previousPointerCoords[0] = new Coordinate(e2.getX(0), e2.getY(0));
-                        previousPointerCoords[1] = new Coordinate(e2.getX(1), e2.getY(1));
+                        previousPointerCoords = new Point[2];
+                        previousPointerCoords[0] = new Point(e2.getX(0), e2.getY(0));
+                        previousPointerCoords[1] = new Point(e2.getX(1), e2.getY(1));
                     } else {
-                        Coordinate[] newCoords = {
-                                new Coordinate(e2.getX(0), e2.getY(0)),
-                                new Coordinate(e2.getX(1), e2.getY(1))
+                        Point[] newCoords = {
+                                new Point(e2.getX(0), e2.getY(0)),
+                                new Point(e2.getX(1), e2.getY(1))
                         };
-                        Coordinate VectorPrevious = previousPointerCoords[1].subtract(previousPointerCoords[0]);
-                        Coordinate VectorNew = newCoords[1].subtract(newCoords[0]);
+                        Point VectorPrevious = previousPointerCoords[1].subtract
+                                (previousPointerCoords[0]);
+                        Point VectorNew = newCoords[1].subtract(newCoords[0]);
                         double diffAngle = VectorNew.angle() - VectorPrevious.angle();
                         double scale = VectorNew.length() / VectorPrevious.length();
 
                         // the transformations
-                        getTransformMatrix().postTranslate((float) -previousPointerCoords[0].getX(), (float) -previousPointerCoords[0].getY());
+                        getTransformMatrix().postTranslate((float) -previousPointerCoords[0].getX
+                                (), (float) -previousPointerCoords[0].getY());
                         getTransformMatrix().postRotate((float) diffAngle);
                         getTransformMatrix().postScale((float) scale, (float) scale);
-                        getTransformMatrix().postTranslate((float) newCoords[0].getX(), (float) newCoords[0].getY());
+                        getTransformMatrix().postTranslate((float) newCoords[0].getX(), (float)
+                                newCoords[0].getY());
 
                         previousPointerCoords = newCoords;
                     }
                     break;
                 case 1:
                     if (EDGE_DRAW_MODE) {
-                        Coordinate sCoordinate = new Coordinate(e2.getX(), e2.getY());
-                        Coordinate gCoordinate = translateCoordinate(sCoordinate);
+                        Point sCoordinate = new Point(e2.getX(), e2.getY());
+                        Point gCoordinate = translateCoordinate(sCoordinate);
                         Node hit = getClosestVertex(gCoordinate, USER_MISS_RADIUS);
 
                         if (hit != null) {
@@ -620,35 +663,34 @@ public class AndroidTopologyViewer extends View {
                         if (touchedVertex != null) {
 
                             if (startCoordinate == null) {
-                                startCoordinate = new Coordinate(touchedVertex.getX(), touchedVertex.getY());
+                                startCoordinate = new Point(touchedVertex.getX(), touchedVertex
+                                        .getY());
                             }
 
-                            trashCan(1);
+                            deleteIcon.setVisible(true);
 
-                            Coordinate sCoordinate = new Coordinate(e2.getX(), e2.getY());
+                            Point sCoordinate = new Point(e2.getX(), e2.getY());
 
-                            if (isOnTrashCan(sCoordinate)) {
-                                trashCan(2);
+                            if (deleteIcon.checkIsOver(sCoordinate)) {
                                 deleteVertex = touchedVertex;
                             } else {
-                                trashCan(1);
                                 deleteVertex = null;
 
                             }
 
-                            Coordinate gCoordinate = translateCoordinate(sCoordinate);
+                            Point gCoordinate = translateCoordinate(sCoordinate);
                             touchedVertex.setLocation(gCoordinate.getX(), gCoordinate.getY());
 
                         } else {
-                            trashCan(0);
-                            if (previousPointerCount == 1)
-                                getTransformMatrix().postTranslate(-distanceX, -distanceY);
+                            deleteIcon.setVisible(false);
+//                            if (previousPointerCount == 1)
+//                                getTransformMatrix().postTranslate(-distanceX, -distanceY);
                         }
 
                     }
                     break;
                 default: // 3 or more
-                    trashCan(0);
+                    deleteIcon.setVisible(false);
                     previousPointerCoords = null;
                     previousPointerCount = e2.getPointerCount();
                     return false;
@@ -660,17 +702,17 @@ public class AndroidTopologyViewer extends View {
 
         public boolean onTouch(View view, MotionEvent event) {
             if (event.getAction() == MotionEvent.ACTION_UP) {
-                if (TRASH_CAN == 2) {
+                if (deleteIcon.isOver()) {
                     if (deleteVertex != null) {
                         getTopology().removeNode(deleteVertex);
-                        Coordinate c = clearCoordinate();
+                        Point c = clearCoordinate();
                         if (c != null)
                             deleteVertex.setLocation(c.getX(), c.getY());
                         deleteVertex = null;
                     }
                 }
                 clearCoordinate();
-                trashCan(0);
+                deleteIcon.setVisible(false);
             }
             return gd.onTouchEvent(event);
         }
@@ -679,64 +721,64 @@ public class AndroidTopologyViewer extends View {
         public void onClick(View v) {
         }
 
-        public void onNodeAdded(Node n) {
-            n.addPropertyListener(this);
-            if (n.getIcon() == null)
-                n.setProperty("icon-bitmap", defaultNodeIcon);
-            else
-                n.setProperty("icon", n.getIcon());
-            redraw();
-        }
-
-        public void onNodeRemoved(Node n) {
-            redraw();
-        }
-
-        public void onLinkAdded(Link l) {
-            l.addPropertyListener(this);
-            redraw();
-        }
-
-        public void onLinkRemoved(Link l) {
-            redraw();
-        }
-
-        public void onMove(Node n) {
-            redraw();
-        }
-
-        public void propertyChanged(_Properties o, String property) {
-            if (o instanceof Node) {
-                Node n = (Node) o;
-                redraw();
-				/*if (property.equals("color")) {
-					jn.updateUI();
-				} else  else if (property.equals("size")) {
-					jn.updateIcon();
-				} */
-                if (property.equals("icon")) {
-                    Resources rsrc = getResources();
-                    int id = rsrc.getIdentifier(n.getIcon(), "drawable", getContext().getPackageName());
-                    Bitmap icon = BitmapFactory.decodeResource(rsrc, id);
-                    if (Node.DEFAULT_DIRECTION != 0.0) {
-                        Matrix mat = new Matrix();
-                        double degrees = -180.0 * Node.DEFAULT_DIRECTION / Math.PI;
-                        mat.setRotate((float)degrees);
-                        icon = Bitmap.createBitmap(icon, 0, 0, icon.getWidth(), icon.getHeight(), mat, true);
-                    }
-                    n.setProperty("icon-bitmap", icon);
-                    redraw();
-                }
-            } else if (property.equals("width") || property.equals("color")) {
-                redraw();
-            }
-        }
-
-        @Override
-        public void onClock() {
-        }
     }
 
+    private class DeleteIcon {
+        private final Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
+                R.drawable.trash64x64);
+        private RectF loc = new RectF();
+        private boolean isOver = false;
+        private boolean visible = false;
+        private final Paint bgPaint;
 
+        DeleteIcon(float x, float y) {
+            bgPaint = new Paint();
+            bgPaint.setColor(Color.RED);
+            bgPaint.setAlpha(0x55);
+            setLocation(x, y);
+        }
 
+        public boolean isOver() {
+            return isOver;
+        }
+
+        void setLocation(float x, float y) {
+            float hw = bitmap.getWidth() / 2.0f;
+            float hh = bitmap.getHeight() / 2.0f;
+            loc.left = x - hw;
+            loc.top = y - hh;
+            loc.right = x + hw;
+            loc.bottom = y + hh;
+        }
+
+        boolean checkIsOver(Point pt) {
+            boolean val = loc.contains((float) pt.getX(), (float) pt.getY());
+            if (val != isOver) {
+                redraw();
+                isOver = val;
+            }
+            return val;
+        }
+
+        void setVisible(boolean visible) {
+            this.visible = visible;
+            redraw();
+        }
+
+        void draw(Canvas canvas) {
+            if (!visible)
+                return;
+            if (isOver) {
+                canvas.drawBitmap(bitmap, loc.left, loc.top, null);
+                float hw = bitmap.getWidth() / 4.0f;
+                float hh = bitmap.getHeight() / 4.0f;
+
+                canvas.drawOval(new RectF(loc.left - hw, loc.top - hh, loc.right + hw,
+                        loc.bottom + hh), bgPaint);
+                //canvas.drawBitmap(trashBgRedBitmap, trashX - 46, trashY - 46, trashPaint);
+            } else {
+                canvas.drawBitmap(bitmap, loc.left, loc.top, null);
+            }
+        }
+    }
 }

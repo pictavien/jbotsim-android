@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"  android:layout_height="100mm"  android:layout_width="100mm">
-    <item android:id="@+id/file"  android:title="File...">
+    <item
+        android:id="@+id/file"
+        android:title="File...">
         <menu>
-            <item android:id="@+id/load"  android:title="Load"/>
-            <item android:id="@+id/save" android:title="Save" />
+            <item
+                android:id="@+id/load"
+                android:title="Load" />
+            <item
+                android:id="@+id/save"
+                android:title="Save" />
         </menu>
     </item>
     <item android:id="@+id/settings"  android:title="Settings...">
         <menu>
-            <item android:id="@+id/set_comrange"  android:title="Communication range"/>
-            <item android:id="@+id/set_sensingrange" android:title="Sensing range"/>
-            <item android:id="@+id/set_clockspeed"  android:title="Clock speed"/>
+            <item android:id="@+id/set_comm_range"  android:title="Communication range"/>
+            <item android:id="@+id/set_sensing_range" android:title="Sensing range"/>
+            <item android:id="@+id/set_clock_speed"  android:title="Clock speed"/>
+            <item android:id="@+id/reset_size"  android:title="Restore topology dimensions"/>
+            <item android:id="@+id/set_size_of_screen"  android:title="Set topology size to screen"/>
         </menu>
     </item>
     <item android:id="@+id/commandmenu"  android:title="Commands...">

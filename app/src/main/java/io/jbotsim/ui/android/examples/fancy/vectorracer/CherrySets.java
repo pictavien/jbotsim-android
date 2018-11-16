@@ -9,8 +9,8 @@ import io.jbotsim.core.Topology;
 public class CherrySets {
     public static void distribute(Topology tp){
         for (int i=0; i<20; i++) {
-            double x = PRNG.nextDouble() * 600 + 100;
-            double y = PRNG.nextDouble() * 400 + 100;
+            double x = PRNG.nextDouble() * tp.getWidth();
+            double y = PRNG.nextDouble() * tp.getHeight();
             tp.addNode(x, y, new Cherry());
         }
     }

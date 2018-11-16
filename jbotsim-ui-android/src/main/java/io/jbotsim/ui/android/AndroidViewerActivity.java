@@ -3,16 +3,29 @@ package io.jbotsim.ui.android;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
-import android.util.DisplayMetrics;
+import android.text.Layout;
+import android.util.AttributeSet;
 import android.view.*;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.Toast;
+
 import io.jbotsim.core.Topology;
+
 import org.json.JSONException;
 
 import java.io.BufferedReader;
@@ -24,13 +37,36 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import io.jbotsim.ui.android.event.CommandListener;
 
-public class AndroidViewerActivity extends Activity {
+public class AndroidViewerActivity
+        extends Activity {
     private Topology topology;
     private AndroidTopologyViewer controller;
+
+    private enum SeekBarMode {
+        NONE(-1),
+        COMM_RANGE(R.drawable.comm_range_thumb),
+        SENSING_RANGE(R.drawable.sensing_range_thumb),
+        CLOCKSPEED(R.drawable.clock_speed_thumb);
+
+        private int mode;
+        SeekBarMode(int m) {
+            mode = m;
+        }
+
+        public int getIntValue() {
+            return mode;
+        }
+    };
+
+    private SeekBar seekBar = null;
+    private SeekBarMode seekBarMode;
+    private HashMap<SeekBarMode, Drawable> bmpCache = new HashMap<>();
+
     private volatile boolean saveOnExit = false;
     protected ArrayList<CommandListener> commandListeners = new ArrayList<>();
     protected ArrayList<String> commands = new ArrayList<String>();
@@ -55,27 +91,47 @@ public class AndroidViewerActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        System.out.println("start AndoidViewerActivity");
-
-//        DisplayMetrics displaymetrics = new DisplayMetrics();
-//        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-//        int height = displaymetrics.heightPixels;
-//        int width = displaymetrics.widthPixels;
-
         setContentView(R.layout.topology_viewer);
 
         controller = findViewById(R.id.topologyview);
         controller.setTopology(topology);
 
+        setupSimulationButtons();
+        setupSeekBar();
+
+        AndroidTopologyViewer.EDGE_DRAW_MODE = false;
+
+        /**
+         *  Welcome Dialog!
+
+         String title = "Grapher";
+         String message = "Tap to create vertices." + "\nHold to toggle between vertex creation and edge drawing mode.";
+
+         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+         builder.setMessage(message).setTitle("AbtoSimtitle);
+
+         builder.setPositiveButton("Ok!", new DialogInterface.OnClickListener() {
+        @Override public void onClick(DialogInterface dialog, int which) {
+        shortToast("Go ahead and graph!");
+        }
+        });
+         builder.setNeutralButton("Load", new DialogInterface.OnClickListener() {
+        @Override public void onClick(DialogInterface dialog, int which) {
+        load();
+        }
+        });
+
+         AlertDialog dialog = builder.create();
+         dialog.show();
+         */
+    }
+
+    private void setupSimulationButtons() {
         Button startButton = findViewById(R.id.startbutton);
         final Button resetButton = findViewById(R.id.resetbutton);
         final Button stepButton = findViewById(R.id.stepbutton);
         resetButton.setVisibility(View.GONE);
         stepButton.setVisibility(View.GONE);
-
-        addCommand("Com 1");
-        addCommand("Com 2");
-        addCommand("Com 3");
 
         if (topology.isStarted()) {
             startButton.setText(R.string.pause);
@@ -88,7 +144,7 @@ public class AndroidViewerActivity extends Activity {
                 Button b = (Button) v;
                 Topology tp = controller.getTopology();
 
-                if(tp.isRunning()) {
+                if (tp.isRunning()) {
                     tp.pause();
                     b.setText(R.string.resume);
                     resetButton.setVisibility(View.VISIBLE);
@@ -110,7 +166,7 @@ public class AndroidViewerActivity extends Activity {
             public void onClick(View v) {
                 Topology tp = getTopology();
 
-                if(!tp.isRunning() && tp.isStarted())
+                if (!tp.isRunning() && tp.isStarted())
                     tp.step();
             }
         });
@@ -120,38 +176,70 @@ public class AndroidViewerActivity extends Activity {
             public void onClick(View v) {
                 Topology tp = getTopology();
 
-                if(!tp.isRunning() && tp.isStarted())
+                if (!tp.isRunning() && tp.isStarted())
                     tp.step();
             }
         });
+    }
 
-        AndroidTopologyViewer.EDGE_DRAW_MODE = false;
+    private Drawable getDrawableForSeekBarMode (SeekBarMode mode) {
+        if (mode == SeekBarMode.NONE)
+            return null;
+        Drawable result = null;
 
-        /**
-         *  Welcome Dialog!
+        if (bmpCache.containsKey(mode)) {
+            result = bmpCache.get(mode);
+        } else {
+            Bitmap bmp = BitmapFactory.decodeResource(getResources(), mode.getIntValue());
+            Matrix m = new Matrix();
+            float ratio = (float) (0.7f*seekBar.getHeight())/ (float) bmp.getHeight();
+            m.setScale(ratio, ratio);
+            bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), m, true);
+            result = new BitmapDrawable(getResources(), bmp);
+            bmpCache.put(mode, result);
+        }
 
-        String title = "Grapher";
-        String message = "Tap to create vertices." + "\nHold to toggle between vertex creation and edge drawing mode.";
+        return result;
+    }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(message).setTitle("AbtoSimtitle);
+    private void setupSeekBar() {
+        seekBar = findViewById(R.id.seekbar);
+        setSeekBarMode(SeekBarMode.NONE);
+    }
 
-        builder.setPositiveButton("Ok!", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                shortToast("Go ahead and graph!");
-            }
-        });
-        builder.setNeutralButton("Load", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                load();
-            }
-        });
+    private void setSeekBarMode(SeekBarMode mode) {
+        Drawable bmp = getDrawableForSeekBarMode(mode);
+        seekBarMode = mode;
+        int value = 0;
+        int maxvalue = 0;
 
-        AlertDialog dialog = builder.create();
-        dialog.show();
-         */
+        Topology tp = getTopology();
+        switch (mode) {
+            case SENSING_RANGE:
+                value = (int) tp.getSensingRange();
+                maxvalue = Math.max(tp.getWidth(), tp.getHeight());
+                break;
+            case CLOCKSPEED:
+                value = tp.getClockSpeed();
+                maxvalue = 2000;
+                break;
+            case COMM_RANGE:
+                value = (int) tp.getCommunicationRange();
+                maxvalue = Math.max(tp.getWidth(), tp.getHeight());
+                break;
+            default:
+                assert (mode == SeekBarMode.NONE);
+                break;
+        }
+        if (bmp == null)
+            seekBar.setVisibility(View.INVISIBLE);
+        else {
+
+            seekBar.setThumb(bmp);
+            seekBar.setVisibility(View.VISIBLE);
+            seekBar.setProgress(value);
+            seekBar.setMax(maxvalue);
+        }
     }
 
     @Override
@@ -161,9 +249,9 @@ public class AndroidViewerActivity extends Activity {
             @Override
             public void onGlobalLayout() {
                 controller.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                int height = controller.getHeight();
-                int width = controller.getWidth();
-                topology.setDimensions(width, height);
+//                int height = controller.getHeight();
+//                int width = controller.getWidth();
+//                topology.setDimensions(width, height);
 
                 try {
                     Intent intent = getIntent();
@@ -174,9 +262,9 @@ public class AndroidViewerActivity extends Activity {
                     Object init = null;
                     init = initClass.newInstance();
                     if (init instanceof TopologyInitializer) {
-                        ((TopologyInitializer)init).initialize(topology);
+                        ((TopologyInitializer) init).initialize(topology);
                     } else if (init instanceof ViewerActivityInitializer) {
-                        ((ViewerActivityInitializer)init).initialize(AndroidViewerActivity.this);
+                        ((ViewerActivityInitializer) init).initialize(AndroidViewerActivity.this);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -203,7 +291,7 @@ public class AndroidViewerActivity extends Activity {
         MenuItem mi = menu.findItem(R.id.commandmenu);
         Menu commandsMenu = mi.getSubMenu();
         commandsMenu.clear();
-        for(String c : commands) {
+        for (String c : commands) {
             MenuItem mic = commandsMenu.add(c);
             mic.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
@@ -217,15 +305,16 @@ public class AndroidViewerActivity extends Activity {
     }
 
     protected void notifyCommandListeners(String command) {
-        for(CommandListener cl : commandListeners) {
+        for (CommandListener cl : commandListeners) {
             cl.onCommand(command);
         }
     }
+
     /**
      * returns a string containing date and graph info
      */
     private String createFileName() {
-        return new Date().toGMTString() + " " + controller.graphInfo();
+        return new Date().toGMTString() + " ";
     }
 
     @Override
@@ -269,24 +358,40 @@ public class AndroidViewerActivity extends Activity {
      * by it's id
      */
     public boolean onOptionsItemSelected(MenuItem item) {
-        // System.out.println("MenuItem      \t" + item.getTitle());
-        // System.out.println(" > Condensed  \t" + item.getTitleCondensed());
-        // System.out.println(" > numeric id \t" + item.getItemId());
-        // System.out.println();
-
         int i = item.getItemId();
+        boolean result = true;
+
         if (i == R.id.quit) {
             saveOnExit = false;
             finish();
-            return true;
         } else if (i == R.id.save) {
             save();
-            return true;
         } else if (i == R.id.load) {
             load();
-            return true;
+        } else if (i == R.id.reset_size) {
+            controller.resetTopologySize();
+        } else if (i == R.id.set_size_of_screen) {
+            controller.resizeTopologyToScreen();
+        } else if (i == R.id.set_clock_speed || i == R.id.set_sensing_range
+                || i == R.id.set_comm_range) {
+            SeekBarMode newMode;
+
+            if (i == R.id.set_clock_speed) {
+                newMode = SeekBarMode.CLOCKSPEED;
+            } else if (i == R.id.set_sensing_range) {
+                newMode = SeekBarMode.SENSING_RANGE;
+            } else {
+                assert (i == R.id.set_comm_range);
+                newMode = SeekBarMode.COMM_RANGE;
+            }
+            if (newMode == seekBarMode)
+                newMode = SeekBarMode.NONE;
+            setSeekBarMode(newMode);
+        } else {
+            result = super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+
+        return result;
     }
 
     public void save() {
@@ -382,9 +487,6 @@ public class AndroidViewerActivity extends Activity {
 
                     new FileAccess().load(controller.getTopology(), json);
 
-                    controller.clearMemory();
-
-                    controller.makeInfo();
                     controller.redraw();
 
                 } catch (FileNotFoundException e) {
@@ -450,6 +552,4 @@ public class AndroidViewerActivity extends Activity {
     public void removeAllCommands() {
         commands.clear();
     }
-
-
 }
