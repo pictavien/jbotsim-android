@@ -390,8 +390,10 @@ public class AndroidTopologyViewer
     }
 
     public void updateStatus() {
-        statusInfo = "# node : " + tp.getNodes().size() + "# nb links: " + tp.getLinks().size() +
-                "# time: " + tp.getTime();
+        statusInfo = "SR : " + tp.getSensingRange() + " CR : " + tp.getCommunicationRange() +
+                " CS : " + tp.getClockSpeed() + "\n" +
+                " # node : " + tp.getNodes().size() + " # nb links: " + tp.getLinks().size() +
+                " # time: " + tp.getTime();
     }
 
     private void writeStatus(Canvas canvas) {
