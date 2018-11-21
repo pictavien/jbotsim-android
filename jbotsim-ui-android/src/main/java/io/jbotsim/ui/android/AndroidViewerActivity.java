@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Layout;
@@ -40,6 +41,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import io.jbotsim.io.serialization.topology.FileTopologySerializer;
+import io.jbotsim.io.serialization.topology.string.xml.XMLTopologySerializer;
 import io.jbotsim.ui.android.event.CommandListener;
 
 public class AndroidViewerActivity
@@ -63,6 +66,7 @@ public class AndroidViewerActivity
         }
     };
 
+    private static final int SEEKBAR_MAX_PERIOD = 40;
     private SeekBar seekBar = null;
     private SeekBarMode seekBarMode;
     private HashMap<SeekBarMode, Drawable> bmpCache = new HashMap<>();
@@ -77,7 +81,9 @@ public class AndroidViewerActivity
 
     public AndroidViewerActivity(Topology topology) {
         this.topology = topology;
+        topology.setFileAccessor(new AndroidFileAccessor(this));
         topology.setClockModel(AndroidClock.class);
+        topology.setTopologySerializer(new XMLTopologySerializer());
     }
 
     public Topology getTopology() {
@@ -192,7 +198,7 @@ public class AndroidViewerActivity
         } else {
             Bitmap bmp = BitmapFactory.decodeResource(getResources(), mode.getIntValue());
             Matrix m = new Matrix();
-            float ratio = (float) (0.7f*seekBar.getHeight())/ (float) bmp.getHeight();
+            float ratio = (float) (0.5f*seekBar.getHeight())/ (float) bmp.getHeight();
             m.setScale(ratio, ratio);
             bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), m, true);
             result = new BitmapDrawable(getResources(), bmp);
@@ -205,6 +211,36 @@ public class AndroidViewerActivity
     private void setupSeekBar() {
         seekBar = findViewById(R.id.seekbar);
         setSeekBarMode(SeekBarMode.NONE);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                switch (seekBarMode) {
+                    case SENSING_RANGE:
+                        getTopology().setSensingRange(progress);
+                        break;
+                    case CLOCKSPEED:
+                        if (SEEKBAR_MAX_PERIOD - progress > 0)
+                            getTopology().setClockSpeed(SEEKBAR_MAX_PERIOD - progress);
+                        break;
+                    case COMM_RANGE:
+                        getTopology().setCommunicationRange(progress);
+                        break;
+                    default:
+                        assert (seekBarMode != SeekBarMode.NONE);
+                        break;
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
     private void setSeekBarMode(SeekBarMode mode) {
@@ -220,8 +256,8 @@ public class AndroidViewerActivity
                 maxvalue = Math.max(tp.getWidth(), tp.getHeight());
                 break;
             case CLOCKSPEED:
-                value = tp.getClockSpeed();
-                maxvalue = 2000;
+                value = SEEKBAR_MAX_PERIOD - tp.getClockSpeed();
+                maxvalue = SEEKBAR_MAX_PERIOD - 1;
                 break;
             case COMM_RANGE:
                 value = (int) tp.getCommunicationRange();
@@ -249,28 +285,28 @@ public class AndroidViewerActivity
             @Override
             public void onGlobalLayout() {
                 controller.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-//                int height = controller.getHeight();
-//                int width = controller.getWidth();
-//                topology.setDimensions(width, height);
 
                 try {
                     Intent intent = getIntent();
-                    String title = intent.getExtras().getString(getPackageName() + ".EXTRA_NAME");
-                    setTitle(title);
-                    String initClassName = intent.getExtras().getString(getPackageName() + ".EXTRA_INIT_CLASS");
-                    Class initClass = Class.forName(initClassName);
-                    Object init = null;
-                    init = initClass.newInstance();
-                    if (init instanceof TopologyInitializer) {
-                        ((TopologyInitializer) init).initialize(topology);
-                    } else if (init instanceof ViewerActivityInitializer) {
-                        ((ViewerActivityInitializer) init).initialize(AndroidViewerActivity.this);
+                    Bundle extras = intent.getExtras();
+                    if (extras.containsKey(getPackageName() + ".EXTRA_URI")) {
+                        load((Uri) extras.get(getPackageName() + ".EXTRA_URI"));
+                    } else {
+                        String title = extras.getString(getPackageName() + ".EXTRA_NAME");
+                        setTitle(title);
+                        String initClassName = extras.getString(getPackageName() + ".EXTRA_INIT_CLASS");
+                        Class initClass = Class.forName(initClassName);
+                        Object init = null;
+                        init = initClass.newInstance();
+                        if (init instanceof TopologyInitializer) {
+                            ((TopologyInitializer) init).initialize(topology);
+                        } else if (init instanceof ViewerActivityInitializer) {
+                            ((ViewerActivityInitializer) init).initialize(AndroidViewerActivity.this);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-                //getTopology().start();
             }
         });
     }
@@ -346,10 +382,12 @@ public class AndroidViewerActivity
     }
 
     public void longToast(String toast) {
+        System.out.println(toast);
         Toast.makeText(AndroidViewerActivity.this, toast, Toast.LENGTH_LONG).show();
     }
 
     public void shortToast(String toast) {
+        System.out.println(toast);
         Toast.makeText(AndroidViewerActivity.this, toast, Toast.LENGTH_SHORT).show();
     }
 
@@ -441,69 +479,36 @@ public class AndroidViewerActivity
         alert.show();
     }
 
-    public void delete() {
-        final String[] files = fileList();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Delete file");
-        builder.setItems(files, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-                System.out.println("DELETE REQUEST " + item + " -- " + files[item]);
+    public static final int CHOOSE_FILENAME_REQUEST_CODE = 12345;
 
-                if (deleteFile(files[item]))
-                    shortToast("Deleted file " + files[item]);
-                else
-                    shortToast("Unable to delete file!");
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        if (requestCode == CHOOSE_FILENAME_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            if (resultData != null) {
+                load(resultData.getData());
             }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
+        }
+    }
+
+    private void load(Uri uri) {
+        Topology tp = getTopology();
+        boolean restart = tp.isRunning();
+        if (restart)
+            tp.pause();
+        tp.clear();
+        setTitle(R.string.jbotsim);
+        new FileTopologySerializer().importFromFile(tp, uri.toString());
+        shortToast("Loading "+ uri);
+        if (restart)
+            tp.resume();
     }
 
     public void load() {
-        System.out.println("load");
-        final String[] files = fileList();
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pick a file");
-        builder.setItems(files, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-                Toast.makeText(getApplicationContext(), files[item], Toast.LENGTH_SHORT).show();
-                try {
-                    StringBuffer stringBuffer = new StringBuffer();
-                    String inputLine = "";
-                    FileInputStream input = openFileInput(files[item].toString());
-                    InputStreamReader isr = new InputStreamReader(input);
-                    BufferedReader bufferedReader = new BufferedReader(isr);
-
-                    while ((inputLine = bufferedReader.readLine()) != null) {
-                        stringBuffer.append(inputLine);
-                        stringBuffer.append("\n");
-                    }
-
-                    bufferedReader.close();
-                    String json = stringBuffer.toString();
-                    System.out.println(json);
-
-                    new FileAccess().load(controller.getTopology(), json);
-
-                    controller.redraw();
-
-                } catch (FileNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
-
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        startActivityForResult(intent, CHOOSE_FILENAME_REQUEST_CODE);
     }
 
     /**

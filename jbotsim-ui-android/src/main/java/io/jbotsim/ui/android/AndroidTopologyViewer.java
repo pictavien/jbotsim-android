@@ -11,6 +11,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.*;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.widget.*;
@@ -399,6 +400,11 @@ public class AndroidTopologyViewer
     private void writeStatus(Canvas canvas) {
         Paint textPaint = new Paint();
         textPaint.setColor(android.graphics.Color.BLACK);
+        int MY_DIP_VALUE = 12;
+
+        float fntSz = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
+                MY_DIP_VALUE, getResources().getDisplayMetrics());
+        textPaint.setTextSize(fntSz);
         Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
         canvas.drawText(statusInfo,0, -fontMetrics.top, textPaint);
     }
@@ -458,6 +464,7 @@ public class AndroidTopologyViewer
 
     @Override
     public void onClock() {
+        redraw();
     }
 
 
