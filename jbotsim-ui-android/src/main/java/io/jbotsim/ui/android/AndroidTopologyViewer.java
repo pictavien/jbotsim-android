@@ -71,7 +71,7 @@ public class AndroidTopologyViewer
 
     private Integer initialWidth = null;
     private Integer initialHeight = null;
-
+    private Paint onDrawPaint = new Paint();
 
     public AndroidTopologyViewer(Context context) {
         this(context, null);
@@ -354,21 +354,20 @@ public class AndroidTopologyViewer
             resetTopologySize();
         }
 
-        Paint paint = new Paint();
-        paint.setColor(BACKGROUND_COLOR);
-        canvas.drawRect(0.0f, 0.0f, canvas.getWidth(), canvas.getHeight(), paint);
+
+        onDrawPaint.setColor(BACKGROUND_COLOR);
+        canvas.drawRect(0.0f, 0.0f, getWidth(), getHeight(), onDrawPaint);
 
         if (deleteIcon == null) {
-            deleteIcon = new DeleteIcon(canvas.getWidth() / 2f, canvas.getHeight() * 0.90f);
+            deleteIcon = new DeleteIcon(getWidth() / 2f, getHeight() * 0.90f);
         }
 
         canvas.save();
         canvas.concat(transformMatrix);
 
-        paint.setColor(android.graphics.Color.WHITE);
-        canvas.drawRect(0.0f, 0.0f, tp.getWidth(), tp.getHeight(), paint);
+        onDrawPaint.setColor(android.graphics.Color.WHITE);
+        canvas.drawRect(0.0f, 0.0f, tp.getWidth(), tp.getHeight(), onDrawPaint);
 
-        assert (tp != null);
         setBackgroundColor(android.graphics.Color.WHITE);
 
         for (BackgroundPainter bp : backgroundPainters) {
@@ -398,15 +397,14 @@ public class AndroidTopologyViewer
     }
 
     private void writeStatus(Canvas canvas) {
-        Paint textPaint = new Paint();
-        textPaint.setColor(android.graphics.Color.BLACK);
+        onDrawPaint.setColor(android.graphics.Color.BLACK);
         int MY_DIP_VALUE = 12;
 
         float fntSz = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
                 MY_DIP_VALUE, getResources().getDisplayMetrics());
-        textPaint.setTextSize(fntSz);
-        Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
-        canvas.drawText(statusInfo,0, -fontMetrics.top, textPaint);
+        onDrawPaint.setTextSize(fntSz);
+        Paint.FontMetrics fontMetrics = onDrawPaint.getFontMetrics();
+        canvas.drawText(statusInfo,0, -fontMetrics.top, onDrawPaint);
     }
 
     public void onNodeAdded(Node n) {
@@ -548,7 +546,7 @@ public class AndroidTopologyViewer
             });
             ListView lv = (ListView) popupModels.findViewById(R.id.nodemodels_list);
             final List<String> models = new ArrayList<>(getTopology().getModelsNames());
-            ArrayAdapter<String> adapter = new ArrayAdapter(getContext(), R.layout
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout
                     .nodemodels_entry, models);
             lv.setAdapter(adapter);
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
