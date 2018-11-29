@@ -3,6 +3,6 @@
         android:id="@+id/nodemodels_entry"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="24dp"
+        android:textSize="24sp"
         android:padding="4pt"/>
 
