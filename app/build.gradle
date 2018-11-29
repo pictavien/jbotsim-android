@@ -24,6 +24,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
 
+    lintOptions {
+        lintOptions {
+            abortOnError false
+        }
     }
 }
 
