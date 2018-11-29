@@ -9,10 +9,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import io.jbotsim.core.io.FileAccessor;
+import android.os.ParcelFileDescriptor;
+import io.jbotsim.core.io.FileManager;
 
 public class AndroidFileAccessor
-        implements FileAccessor {
+        extends FileManager {
     private Context ctx;
 
     public AndroidFileAccessor(Context context) {
@@ -23,7 +24,7 @@ public class AndroidFileAccessor
     public InputStream getInputStreamForName(String s) throws IOException {
         if(!isExternalStorageReadable())
             return null;
-        InputStream result = null;
+        InputStream result;
         try {
             Uri uri = Uri.parse(s);
             result = ctx.getContentResolver().openInputStream(uri);
@@ -37,7 +38,19 @@ public class AndroidFileAccessor
 
     @Override
     public OutputStream getOutputStreamForName(String s) throws IOException {
-        return null;
+        if(!isExternalStorageWritable())
+            return null;
+        OutputStream result;
+        try {
+            Uri uri = Uri.parse(s);
+            ParcelFileDescriptor pfd = ctx.getContentResolver().openFileDescriptor(uri, "w");
+            result = new ParcelFileDescriptor.AutoCloseOutputStream(pfd);
+        } catch (FileNotFoundException e) {
+            result = null;
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     public static boolean isExternalStorageWritable() {

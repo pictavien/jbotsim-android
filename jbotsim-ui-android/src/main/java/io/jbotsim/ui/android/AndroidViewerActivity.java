@@ -27,28 +27,30 @@ import android.widget.Toast;
 
 import io.jbotsim.core.Topology;
 
+import io.jbotsim.core.io.FileManager;
+import io.jbotsim.serialization.dot.DotTopologySerializer;
 import org.json.JSONException;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import io.jbotsim.io.serialization.topology.FileTopologySerializer;
-import io.jbotsim.io.serialization.topology.string.xml.XMLTopologySerializer;
+import io.jbotsim.serialization.TopologySerializerFilenameMatcher;
+import io.jbotsim.serialization.TopologySerializer;
+
+import io.jbotsim.serialization.plain.PlainTopologySerializer;
+import io.jbotsim.serialization.xml.XMLParser;
+import io.jbotsim.serialization.xml.XMLTopologySerializer;
 import io.jbotsim.ui.android.event.CommandListener;
 
 public class AndroidViewerActivity
         extends Activity {
-    private Topology topology;
-    private AndroidTopologyViewer controller;
+    private Topology topology_;
+    private AndroidTopologyViewer controller = null;
 
     private enum SeekBarMode {
         NONE(-1),
@@ -80,14 +82,27 @@ public class AndroidViewerActivity
     }
 
     public AndroidViewerActivity(Topology topology) {
-        this.topology = topology;
-        topology.setFileAccessor(new AndroidFileAccessor(this));
-        topology.setClockModel(AndroidClock.class);
-        topology.setTopologySerializer(new XMLTopologySerializer());
+        System.setProperty(XMLParser.VALIDATE_DOCUMENT_PROPERTY, "false");
+        setTopology(topology);
     }
 
     public Topology getTopology() {
-        return topology;
+        return topology_;
+    }
+
+    public void setTopology(Topology topology) {
+        if(topology_ != null) {
+            if (topology_.isRunning())
+                topology_.pause();
+            topology_.clear();
+        }
+
+        topology_ = topology;
+        topology_.setFileManager(new AndroidFileAccessor(this));
+        topology_.setClockModel(AndroidClock.class);
+        topology_.setTopologySerializer(new XMLTopologySerializer());
+        if(controller != null)
+            controller.setTopology(topology_);
     }
 
     /**
@@ -100,36 +115,12 @@ public class AndroidViewerActivity
         setContentView(R.layout.topology_viewer);
 
         controller = findViewById(R.id.topologyview);
-        controller.setTopology(topology);
+        controller.setTopology(getTopology());
 
         setupSimulationButtons();
         setupSeekBar();
 
         AndroidTopologyViewer.EDGE_DRAW_MODE = false;
-
-        /**
-         *  Welcome Dialog!
-
-         String title = "Grapher";
-         String message = "Tap to create vertices." + "\nHold to toggle between vertex creation and edge drawing mode.";
-
-         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-         builder.setMessage(message).setTitle("AbtoSimtitle);
-
-         builder.setPositiveButton("Ok!", new DialogInterface.OnClickListener() {
-        @Override public void onClick(DialogInterface dialog, int which) {
-        shortToast("Go ahead and graph!");
-        }
-        });
-         builder.setNeutralButton("Load", new DialogInterface.OnClickListener() {
-        @Override public void onClick(DialogInterface dialog, int which) {
-        load();
-        }
-        });
-
-         AlertDialog dialog = builder.create();
-         dialog.show();
-         */
     }
 
     private void setupSimulationButtons() {
@@ -139,7 +130,7 @@ public class AndroidViewerActivity
         resetButton.setVisibility(View.GONE);
         stepButton.setVisibility(View.GONE);
 
-        if (topology.isStarted()) {
+        if (getTopology().isStarted()) {
             startButton.setText(R.string.pause);
         } else {
             startButton.setText(R.string.start);
@@ -164,16 +155,6 @@ public class AndroidViewerActivity
                     resetButton.setVisibility(View.GONE);
                     stepButton.setVisibility(View.GONE);
                 }
-            }
-        });
-
-        findViewById(R.id.stepbutton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Topology tp = getTopology();
-
-                if (!tp.isRunning() && tp.isStarted())
-                    tp.step();
             }
         });
 
@@ -226,7 +207,9 @@ public class AndroidViewerActivity
                         getTopology().setCommunicationRange(progress);
                         break;
                     default:
-                        assert (seekBarMode != SeekBarMode.NONE);
+                        if(BuildConfig.DEBUG && !(seekBarMode != SeekBarMode.NONE)) {
+                            throw new AssertionError();
+                        }
                         break;
                 }
             }
@@ -264,7 +247,9 @@ public class AndroidViewerActivity
                 maxvalue = Math.max(tp.getWidth(), tp.getHeight());
                 break;
             default:
-                assert (mode == SeekBarMode.NONE);
+                if(BuildConfig.DEBUG && !(mode == SeekBarMode.NONE)) {
+                    throw new AssertionError();
+                }
                 break;
         }
         if (bmp == null)
@@ -299,7 +284,7 @@ public class AndroidViewerActivity
                         Object init = null;
                         init = initClass.newInstance();
                         if (init instanceof TopologyInitializer) {
-                            ((TopologyInitializer) init).initialize(topology);
+                            ((TopologyInitializer) init).initialize(getTopology());
                         } else if (init instanceof ViewerActivityInitializer) {
                             ((ViewerActivityInitializer) init).initialize(AndroidViewerActivity.this);
                         }
@@ -346,39 +331,9 @@ public class AndroidViewerActivity
         }
     }
 
-    /**
-     * returns a string containing date and graph info
-     */
-    private String createFileName() {
-        return new Date().toGMTString() + " ";
-    }
-
     @Override
-    @SuppressLint("WorldReadableFiles")
     protected void onDestroy() {
         super.onDestroy();
-
-        if (controller.getTopology().getNodes().size() > 0 && saveOnExit) {
-            try {
-                String json = new FileAccess().save(controller.getTopology());
-                FileOutputStream fOut = openFileOutput(createFileName() + ".json", MODE_WORLD_READABLE);
-                OutputStreamWriter osw = new OutputStreamWriter(fOut);
-
-                // Write the string to the file
-                osw.write(json);
-
-                /*
-                 * ensure that everything is really written out and close
-                 */
-                osw.flush();
-                osw.close();
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public void longToast(String toast) {
@@ -419,7 +374,9 @@ public class AndroidViewerActivity
             } else if (i == R.id.set_sensing_range) {
                 newMode = SeekBarMode.SENSING_RANGE;
             } else {
-                assert (i == R.id.set_comm_range);
+                if(BuildConfig.DEBUG && !(i == R.id.set_comm_range)) {
+                    throw new AssertionError();
+                }
                 newMode = SeekBarMode.COMM_RANGE;
             }
             if (newMode == seekBarMode)
@@ -432,76 +389,35 @@ public class AndroidViewerActivity
         return result;
     }
 
-    public void save() {
-
-        System.out.println("save");
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-        alert.setTitle("Title");
-        alert.setMessage("Message");
-
-        // Set an EditText view to get user input
-        final EditText input = new EditText(this);
-        alert.setView(input);
-
-        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            @SuppressLint("WorldReadableFiles")
-            public void onClick(DialogInterface dialog, int whichButton) {
-                Editable value = input.getText();
-                try {
-                    String json = new FileAccess().save(controller.getTopology());
-                    FileOutputStream fOut = openFileOutput(value + ".json", MODE_WORLD_READABLE);
-                    OutputStreamWriter osw = new OutputStreamWriter(fOut);
-
-                    // Write the string to the file
-                    osw.write(json);
-
-                    /*
-                     * ensure that everything is really written out and close
-                     */
-                    osw.flush();
-                    osw.close();
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Canceled.
-            }
-        });
-
-        alert.show();
-    }
-
 
     public static final int CHOOSE_FILENAME_REQUEST_CODE = 12345;
+    public static final int CREATE_FILENAME_REQUEST_CODE = 31415;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        if (requestCode == CHOOSE_FILENAME_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            if (resultData != null) {
-                load(resultData.getData());
-            }
+        if (resultCode != Activity.RESULT_OK || resultData == null) {
+            return;
+        }
+
+        if (requestCode == CHOOSE_FILENAME_REQUEST_CODE) {
+            load(resultData.getData());
+        } else if (requestCode == CREATE_FILENAME_REQUEST_CODE) {
+            save(resultData.getData());
         }
     }
 
     private void load(Uri uri) {
-        Topology tp = getTopology();
-        boolean restart = tp.isRunning();
-        if (restart)
-            tp.pause();
-        tp.clear();
         setTitle(R.string.jbotsim);
-        new FileTopologySerializer().importFromFile(tp, uri.toString());
-        shortToast("Loading "+ uri);
-        if (restart)
-            tp.resume();
+        setTopology(new Topology());
+        TopologySerializer ts = getConfiguredTopologyFileNameMatcher().getTopologySerializerFor(uri.getPath());
+        if (ts == null) {
+            shortToast("Unsupported file format");
+        } else {
+            String fileContent = getTopology().getFileManager().read(uri.toString());
+            ts.importTopology(getTopology(), fileContent);
+            shortToast("Loading " + uri.getPath());
+            setupSimulationButtons();
+        }
     }
 
     public void load() {
@@ -509,6 +425,37 @@ public class AndroidViewerActivity
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
         startActivityForResult(intent, CHOOSE_FILENAME_REQUEST_CODE);
+    }
+
+    public void save(Uri uri) {
+        Topology tp = getTopology();
+        boolean restart = tp.isRunning();
+        if (restart)
+            tp.pause();
+
+        TopologySerializer ts = getConfiguredTopologyFileNameMatcher().getTopologySerializerFor(uri.getPath());
+        String fileContent = ts.exportTopology(tp);
+        FileManager fm = tp.getFileManager();
+        fm.write(uri.toString(), fileContent);
+        shortToast("Topology stored in "+ uri);
+        if (restart)
+            tp.resume();
+    }
+
+    public void save() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/xml");
+        startActivityForResult(intent, CREATE_FILENAME_REQUEST_CODE);
+    }
+
+    private static TopologySerializerFilenameMatcher getConfiguredTopologyFileNameMatcher() {
+        TopologySerializerFilenameMatcher filenameMatcher = new TopologySerializerFilenameMatcher();
+        filenameMatcher.addTopologySerializer(".*\\.dot$",new DotTopologySerializer());
+        filenameMatcher.addTopologySerializer(".*\\.xdot$",new DotTopologySerializer());
+        filenameMatcher.addTopologySerializer(".*\\.xml$",new XMLTopologySerializer());
+        filenameMatcher.addTopologySerializer(".*\\.plain$",new PlainTopologySerializer());
+        return filenameMatcher;
     }
 
     /**
