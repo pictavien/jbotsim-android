@@ -20,7 +20,7 @@ public class SimpleHighway implements ClockListener, TopologyListener, TopologyI
 	}
 
 	public void onNodeAdded(Node n) {
-		n.setProperty("speed", new Double(PRNG.nextDouble()*50+30));
+		n.setProperty("speed", Double.valueOf(PRNG.nextDouble()*50+30));
 		n.setLocation(n.getX(),voie?200:186);
 		n.setDirection(0);
         voie=!voie;

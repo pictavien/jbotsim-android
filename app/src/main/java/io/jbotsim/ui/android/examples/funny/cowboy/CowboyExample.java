@@ -4,8 +4,7 @@ package io.jbotsim.ui.android.examples.funny.cowboy;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.graphics.RectF;
 
 import io.jbotsim.core.Node;
 import io.jbotsim.core.Topology;
@@ -33,14 +32,13 @@ public class CowboyExample implements ClockListener, BackgroundPainter, ViewerAc
         finished = isFinished();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void paintBackground(Canvas canvas, Topology topology) {
         Paint pt = new Paint();
         pt.setColor(Color.BLACK);
         pt.setStyle(Paint.Style.STROKE);
         pt.setStrokeWidth(1.0f);
-        canvas.drawOval(50,50,200,200, pt);
+        canvas.drawOval(new RectF(50f,50f,200f,200f), pt);
         if (finished) {
             canvas.drawText("YEAH !", 300, 150, pt);
         }

@@ -3,8 +3,8 @@ package io.jbotsim.ui.android.examples.funny.soccer;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 
 import io.jbotsim.ui.android.ViewerActivityInitializer;
 import io.jbotsim.core.Topology;
@@ -25,7 +25,6 @@ public class SoccerExample implements  BackgroundPainter, ViewerActivityInitiali
         return true;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void paintBackground(Canvas canvas, Topology topology) {
         Paint pt = new Paint();
@@ -37,6 +36,7 @@ public class SoccerExample implements  BackgroundPainter, ViewerActivityInitiali
 
         pt.setStyle(Paint.Style.STROKE);
         pt.setColor(Color.WHITE);
-        canvas.drawOval(w / 2 - 60, h / 2 - 60, w / 2 + 60, h / 2 + 60, pt);
+        canvas.drawOval(new RectF(w / 2 - 60, h / 2 - 60, w / 2 + 60,
+                h / 2 + 60), pt);
     }
 }

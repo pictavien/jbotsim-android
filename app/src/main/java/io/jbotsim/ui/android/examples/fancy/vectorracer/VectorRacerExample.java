@@ -2,8 +2,8 @@ package io.jbotsim.ui.android.examples.fancy.vectorracer;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 
 import io.jbotsim.core.Node;
 import io.jbotsim.core.Topology;
@@ -54,7 +54,6 @@ public class VectorRacerExample implements ClockListener, BackgroundPainter, Vie
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void paintBackground(Canvas canvas, Topology topology) {
         VectorNode drone = null;
@@ -70,7 +69,7 @@ public class VectorRacerExample implements ClockListener, BackgroundPainter, Vie
         float t = (float) (drone.getY() + drone.vector.getY() - radius);
         float r = (float) (drone.getX() + drone.vector.getX() + radius);
         float b = (float) (drone.getY() + drone.vector.getY() + radius);
-        canvas.drawOval(l, t, r, b, pt);
+        canvas.drawOval(new RectF(l, t, r, b), pt);
 
         if (score != null) {
             String s = "Score: " + Integer.toString(score);

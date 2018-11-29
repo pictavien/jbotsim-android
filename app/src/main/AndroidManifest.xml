@@ -33,7 +33,6 @@
                 android:name="io.jbotsim.ui.android.AndroidViewerActivity"
                 android:configChanges="orientation|keyboardHidden"
                 android:parentActivityName=".JBotSimAndroidExamples">
-                android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
         </activity>
     </application>
 </manifest>

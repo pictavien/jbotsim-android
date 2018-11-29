@@ -1,13 +1,14 @@
 package io.jbotsim.ui.android.painting;
 
-import android.graphics.*;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.RectF;
 
 import io.jbotsim.core.Node;
 
 public class DefaultNodePainter implements NodePainter {
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void paintNode(Canvas canvas, Node node) {
 
@@ -41,7 +42,7 @@ public class DefaultNodePainter implements NodePainter {
             float r = (float) (node.getX() + radius);
             float b = (float) (node.getY() + radius);
 
-            canvas.drawOval(l, t, r, b, nP);
+            canvas.drawOval(new RectF(l, t, r, b), nP);
         }
     }
 }

@@ -2,8 +2,7 @@ package io.jbotsim.ui.android.painting;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.graphics.RectF;
 
 import io.jbotsim.core.Color;
 import io.jbotsim.core.Node;
@@ -12,7 +11,6 @@ import io.jbotsim.core.Topology;
 public class DefaultBackgroundPainter implements BackgroundPainter {
     public static final Color DEFAULT_SENSING_RANGE_COLOR = Color.gray;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void paintBackground(Canvas canvas, Topology topology) {
         Paint srPaint = new Paint();
@@ -25,7 +23,7 @@ public class DefaultBackgroundPainter implements BackgroundPainter {
                 float t = (float) (n.getY() - sR);
                 float r = (float) (n.getX() + sR);
                 float b = (float) (n.getY() + sR);
-                canvas.drawOval(l, t, r, b, srPaint);
+                canvas.drawOval(new RectF(l, t, r, b), srPaint);
             }
         }
     }
