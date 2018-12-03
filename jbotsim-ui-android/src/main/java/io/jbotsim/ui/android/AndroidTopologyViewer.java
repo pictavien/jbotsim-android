@@ -88,10 +88,14 @@ public class AndroidTopologyViewer
         evh = new EventHandler();
         setOnClickListener(evh);
         setOnTouchListener(evh);
+        resetPainters();
+        defaultNodeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.nodeicon);
+    }
+
+    public void resetPainters() {
         setDefaultBackgroundPainter(new DefaultBackgroundPainter());
         setDefaultNodePainter(new DefaultNodePainter());
         setLinkPainter(new DefaultLinkPainter());
-        defaultNodeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.nodeicon);
     }
 
     public void setTopology(Topology topology) {
@@ -414,7 +418,7 @@ public class AndroidTopologyViewer
     public void onNodeAdded(Node n) {
         n.addPropertyListener(this);
         if (n.getIcon() == null)
-            n.setProperty("icon-bitmap", defaultNodeIcon);
+            n.setProperty(DefaultNodePainter.NODE_ICON_BITMAP_PROPERTY, defaultNodeIcon);
         else
             n.setProperty("icon", n.getIcon());
         redraw();
@@ -450,13 +454,7 @@ public class AndroidTopologyViewer
                 Resources rsrc = getResources();
                 int id = rsrc.getIdentifier(n.getIcon(), "drawable", getContext().getPackageName());
                 Bitmap icon = BitmapFactory.decodeResource(rsrc, id);
-                if (Node.DEFAULT_DIRECTION != 0.0) {
-                    Matrix mat = new Matrix();
-                    double degrees = -180.0 * Node.DEFAULT_DIRECTION / Math.PI;
-                    mat.setRotate((float) degrees);
-                    icon = Bitmap.createBitmap(icon, 0, 0, icon.getWidth(), icon.getHeight(), mat, true);
-                }
-                n.setProperty("icon-bitmap", icon);
+                n.setProperty(DefaultNodePainter.NODE_ICON_BITMAP_PROPERTY, icon);
                 redraw();
             }
         } else if (property.equals("width") || property.equals("color")) {

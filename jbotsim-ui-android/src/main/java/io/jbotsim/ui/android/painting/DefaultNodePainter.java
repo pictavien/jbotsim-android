@@ -11,6 +11,8 @@ import io.jbotsim.ui.painting.NodePainter;
 import io.jbotsim.ui.painting.UIComponent;
 
 public class DefaultNodePainter implements NodePainter {
+    public static final String NODE_ICON_BITMAP_PROPERTY = "icon-bitmap";
+
     @Override
     public void paintNode(UIComponent g2d, Node node) {
 
@@ -18,11 +20,11 @@ public class DefaultNodePainter implements NodePainter {
         // We did not paint into a buttone but in the canvas
 
         Canvas canvas = (Canvas) g2d.getComponent();
-        Bitmap bmp = (Bitmap) node.getProperty("icon-bitmap");
+        Bitmap bmp = (Bitmap) node.getProperty(NODE_ICON_BITMAP_PROPERTY);
         if (bmp != null) {
             Paint np = new Paint();
             Matrix mat = new Matrix();
-            float degrees = (float) (180.0 * node.getDirection() / Math.PI);
+            float degrees = (float) (180.0 * (node.getDirection() - Node.DEFAULT_DIRECTION) / Math.PI);
             float size = 2.0f * node.getSize();
             float sx = size / bmp.getWidth();
             float sy = size / bmp.getHeight();
