@@ -2,22 +2,4 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="io.jbotsim.ui.android">
-
-    <!-- <uses-sdk
-        android:minSdkVersion="21"
-        android:targetSdkVersion="28" />
-        -->
-<!--
-    <application
-        android:allowBackup="false"
-        android:enabled="true"
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        tools:ignore="GoogleAppIndexingWarning">
-
-        <activity
-            android:name=".AndroidViewerActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
-    </application>-->
 </manifest>

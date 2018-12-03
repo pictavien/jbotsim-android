@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
 
     defaultConfig {
-        applicationId "io.jbotsim.ui.android.examples.JBotSimAndroidExamples"
+        applicationId "io.jbotsim.ui.android.examples.JBotSimExamples"
         minSdkVersion 19
         targetSdkVersion 19
         versionCode 1
