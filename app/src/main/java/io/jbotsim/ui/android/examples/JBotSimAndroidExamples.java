@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import io.jbotsim.io.serialization.topology.FileTopologySerializer;
 import io.jbotsim.ui.android.examples.R;
 import io.jbotsim.ui.android.examples.fancy.angularforces.AngularForcesExample;
 import io.jbotsim.ui.android.examples.fancy.canadairs.CanadairsExample;
@@ -27,7 +26,6 @@ import io.jbotsim.ui.android.examples.misc.mobilitymodels.GlobalRWP;
 import io.jbotsim.ui.android.examples.misc.mobilitymodels.SimpleHighway;
 import io.jbotsim.ui.android.AndroidViewerActivity;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import io.jbotsim.ui.android.examples.basic.broadcasting.BroadcastingNode;
 import io.jbotsim.ui.android.examples.basic.mobilebroadcast.MobileBroadcastNode;
@@ -89,6 +87,30 @@ public class JBotSimAndroidExamples extends Activity {
                 });
             }
         }
+
+        /**
+         *  Welcome Dialog!
+
+         String title = "Grapher";
+         String message = "Tap to create vertices." + "\nHold to toggle between vertex creation and edge drawing mode.";
+
+         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+         builder.setMessage(message).setTitle("AbtoSimtitle);
+
+         builder.setPositiveButton("Ok!", new DialogInterface.OnClickListener() {
+        @Override public void onClick(DialogInterface dialog, int which) {
+        shortToast("Go ahead and graph!");
+        }
+        });
+         builder.setNeutralButton("Load", new DialogInterface.OnClickListener() {
+        @Override public void onClick(DialogInterface dialog, int which) {
+        load();
+        }
+        });
+
+         AlertDialog dialog = builder.create();
+         dialog.show();
+         */
     }
 
     // Initiating Menu XML file (menu.xml)

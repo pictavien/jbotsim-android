@@ -7,15 +7,17 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 
 import io.jbotsim.core.Node;
+import io.jbotsim.ui.painting.NodePainter;
+import io.jbotsim.ui.painting.UIComponent;
 
 public class DefaultNodePainter implements NodePainter {
     @Override
-    public void paintNode(Canvas canvas, Node node) {
+    public void paintNode(UIComponent g2d, Node node) {
 
         // Different from SWING version
-        // We did not paint into a button but in the canvas
+        // We did not paint into a buttone but in the canvas
 
-
+        Canvas canvas = (Canvas) g2d.getComponent();
         Bitmap bmp = (Bitmap) node.getProperty("icon-bitmap");
         if (bmp != null) {
             Paint np = new Paint();

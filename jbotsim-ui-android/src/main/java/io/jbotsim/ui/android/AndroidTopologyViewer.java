@@ -17,16 +17,19 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.widget.*;
 
 import io.jbotsim.core.Link;
+import io.jbotsim.core.Point;
 import io.jbotsim.core.Node;
 import io.jbotsim.core.Topology;
-import io.jbotsim.core._Properties;
 import io.jbotsim.core.event.*;
-import io.jbotsim.ui.android.painting.BackgroundPainter;
+import io.jbotsim.core.Properties;
+import io.jbotsim.ui.painting.UIComponent;
+import io.jbotsim.ui.painting.BackgroundPainter;
+import io.jbotsim.ui.painting.LinkPainter;
+import io.jbotsim.ui.painting.NodePainter;
+
 import io.jbotsim.ui.android.painting.DefaultBackgroundPainter;
 import io.jbotsim.ui.android.painting.DefaultLinkPainter;
 import io.jbotsim.ui.android.painting.DefaultNodePainter;
-import io.jbotsim.ui.android.painting.LinkPainter;
-import io.jbotsim.ui.android.painting.NodePainter;
 
 import android.graphics.Color;
 
@@ -68,7 +71,7 @@ public class AndroidTopologyViewer
     private DeleteIcon deleteIcon = null;
 
     private EventHandler evh;
-
+    private UIComponent g2d = new UIComponent();
     private Integer initialWidth = null;
     private Integer initialHeight = null;
     private Paint onDrawPaint = new Paint();
@@ -349,6 +352,7 @@ public class AndroidTopologyViewer
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        g2d.setComponent(canvas);
 
         if (transformMatrix == null) {
             resetTopologySize();
@@ -371,17 +375,17 @@ public class AndroidTopologyViewer
         setBackgroundColor(android.graphics.Color.WHITE);
 
         for (BackgroundPainter bp : backgroundPainters) {
-            bp.paintBackground(canvas, tp);
+            bp.paintBackground(g2d, tp);
         }
 
         for (Node node : tp.getNodes()) {
             for (NodePainter np : nodePainters) {
-                np.paintNode(canvas, node);
+                np.paintNode(g2d, node);
             }
         }
 
         for (Link link : tp.getLinks()) {
-            linkPainter.paintLink(canvas, link);
+            linkPainter.paintLink(g2d, link);
         }
         canvas.restore();
 
@@ -433,7 +437,7 @@ public class AndroidTopologyViewer
         redraw();
     }
 
-    public void propertyChanged(_Properties o, String property) {
+    public void onPropertyChanged(Properties o, String property) {
         if (o instanceof Node) {
             Node n = (Node) o;
             redraw();
@@ -561,6 +565,19 @@ public class AndroidTopologyViewer
             popuprunning = true;
         }
 
+        double pointAngle(Point p) {
+            double angle = Math.atan2(p.getY(), p.getX());
+            return angle * (180.0 / Math.PI);
+        }
+
+        double pointLength(Point p) {
+            return p.distance(0.0,0.0);
+        }
+
+        Point pointSubtract(Point p, Point c) {
+            return new Point(p.getX() - c.getX(), p.getY() - c.getY());
+        }
+
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
             deleteIcon.setVisible(false);
@@ -628,11 +645,10 @@ public class AndroidTopologyViewer
                                 new Point(e2.getX(0), e2.getY(0)),
                                 new Point(e2.getX(1), e2.getY(1))
                         };
-                        Point VectorPrevious = previousPointerCoords[1].subtract
-                                (previousPointerCoords[0]);
-                        Point VectorNew = newCoords[1].subtract(newCoords[0]);
-                        double diffAngle = VectorNew.angle() - VectorPrevious.angle();
-                        double scale = VectorNew.length() / VectorPrevious.length();
+                        Point VectorPrevious = pointSubtract(previousPointerCoords[1], previousPointerCoords[0]);
+                        Point VectorNew = pointSubtract(newCoords[1],newCoords[0]);
+                        double diffAngle = pointAngle(VectorNew) - pointAngle(VectorPrevious);
+                        double scale = pointLength(VectorNew) / pointLength(VectorPrevious);
 
                         // the transformations
                         getTransformMatrix().postTranslate((float) -previousPointerCoords[0].getX

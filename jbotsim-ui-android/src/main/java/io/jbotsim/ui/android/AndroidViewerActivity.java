@@ -14,7 +14,9 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.text.Editable;
 import android.text.Layout;
 import android.util.AttributeSet;
@@ -45,7 +47,7 @@ import io.jbotsim.serialization.TopologySerializer;
 import io.jbotsim.serialization.plain.PlainTopologySerializer;
 import io.jbotsim.serialization.xml.XMLParser;
 import io.jbotsim.serialization.xml.XMLTopologySerializer;
-import io.jbotsim.ui.android.event.CommandListener;
+import io.jbotsim.ui.CommandListener;
 
 public class AndroidViewerActivity
         extends Activity {
@@ -112,6 +114,8 @@ public class AndroidViewerActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (savedInstanceState != null)
+            System.err.println("not  null state");
         setContentView(R.layout.topology_viewer);
 
         controller = findViewById(R.id.topologyview);
@@ -121,6 +125,73 @@ public class AndroidViewerActivity
         setupSeekBar();
 
         AndroidTopologyViewer.EDGE_DRAW_MODE = false;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        controller.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                controller.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                try {
+                    Intent intent = getIntent();
+                    Bundle extras = intent.getExtras();
+                    if (extras.containsKey(getPackageName() + ".EXTRA_URI")) {
+                        load((Uri) extras.get(getPackageName() + ".EXTRA_URI"));
+                    } else {
+                        String title = extras.getString(getPackageName() + ".EXTRA_NAME");
+                        setTitle(title);
+                        String initClassName = extras.getString(getPackageName() + ".EXTRA_INIT_CLASS");
+                        Class initClass = Class.forName(initClassName);
+                        Object init = null;
+                        init = initClass.newInstance();
+                        if (init instanceof TopologyInitializer) {
+                            ((TopologyInitializer) init).initialize(getTopology());
+                        } else if (init instanceof ViewerActivityInitializer) {
+                            ((ViewerActivityInitializer) init).initialize(AndroidViewerActivity.this);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private static final String STATE_KEY_MY_TOPOLOGY = "MY_TOPOLOGY";
+    private static final String STATE_KEY_IS_RUNNING = "MY_TOPOLOGY_IS_RUNNING";
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Topology tp = getTopology();
+        boolean isRunning = tp.isRunning();
+        tp.pause();
+        String state = new XMLTopologySerializer().exportTopology(tp);
+        outState.putCharSequence(STATE_KEY_MY_TOPOLOGY, state);
+        outState.putBoolean(STATE_KEY_IS_RUNNING, isRunning);
+        tp.resume();
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        String state = savedInstanceState.getString(STATE_KEY_MY_TOPOLOGY);
+        if (state != null) {
+            boolean isRunning = savedInstanceState.getBoolean(STATE_KEY_IS_RUNNING);
+            Topology tp = new Topology();
+            new XMLTopologySerializer().importTopology(tp, state);
+            if (isRunning)
+                tp.start();
+            setTopology(tp);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private void setupSimulationButtons() {
@@ -263,38 +334,6 @@ public class AndroidViewerActivity
         }
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        controller.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                controller.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-
-                try {
-                    Intent intent = getIntent();
-                    Bundle extras = intent.getExtras();
-                    if (extras.containsKey(getPackageName() + ".EXTRA_URI")) {
-                        load((Uri) extras.get(getPackageName() + ".EXTRA_URI"));
-                    } else {
-                        String title = extras.getString(getPackageName() + ".EXTRA_NAME");
-                        setTitle(title);
-                        String initClassName = extras.getString(getPackageName() + ".EXTRA_INIT_CLASS");
-                        Class initClass = Class.forName(initClassName);
-                        Object init = null;
-                        init = initClass.newInstance();
-                        if (init instanceof TopologyInitializer) {
-                            ((TopologyInitializer) init).initialize(getTopology());
-                        } else if (init instanceof ViewerActivityInitializer) {
-                            ((ViewerActivityInitializer) init).initialize(AndroidViewerActivity.this);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
 
     public AndroidTopologyViewer getViewer() {
         return controller;
@@ -329,11 +368,6 @@ public class AndroidViewerActivity
         for (CommandListener cl : commandListeners) {
             cl.onCommand(command);
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     public void longToast(String toast) {
@@ -451,10 +485,10 @@ public class AndroidViewerActivity
 
     private static TopologySerializerFilenameMatcher getConfiguredTopologyFileNameMatcher() {
         TopologySerializerFilenameMatcher filenameMatcher = new TopologySerializerFilenameMatcher();
-        filenameMatcher.addTopologySerializer(".*\\.dot$",new DotTopologySerializer());
-        filenameMatcher.addTopologySerializer(".*\\.xdot$",new DotTopologySerializer());
         filenameMatcher.addTopologySerializer(".*\\.xml$",new XMLTopologySerializer());
         filenameMatcher.addTopologySerializer(".*\\.plain$",new PlainTopologySerializer());
+        filenameMatcher.addTopologySerializer(".*\\.xdot$",new DotTopologySerializer());
+        filenameMatcher.addTopologySerializer(".*\\.dot$",new DotTopologySerializer());
         return filenameMatcher;
     }
 

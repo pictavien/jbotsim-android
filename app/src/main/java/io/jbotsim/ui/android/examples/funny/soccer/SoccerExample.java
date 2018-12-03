@@ -4,12 +4,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.os.Build;
 
 import io.jbotsim.ui.android.ViewerActivityInitializer;
 import io.jbotsim.core.Topology;
 import io.jbotsim.ui.android.AndroidViewerActivity;
-import io.jbotsim.ui.android.painting.BackgroundPainter;
+import io.jbotsim.ui.painting.BackgroundPainter;
+import io.jbotsim.ui.painting.UIComponent;
 
 
 public class SoccerExample implements  BackgroundPainter, ViewerActivityInitializer {
@@ -26,7 +26,8 @@ public class SoccerExample implements  BackgroundPainter, ViewerActivityInitiali
     }
 
     @Override
-    public void paintBackground(Canvas canvas, Topology topology) {
+    public void paintBackground(UIComponent g2d, Topology topology) {
+        Canvas canvas = (Canvas) g2d.getComponent ();
         Paint pt = new Paint();
         pt.setStyle(Paint.Style.FILL_AND_STROKE);
         pt.setColor(Color.rgb(0, 156, 0));

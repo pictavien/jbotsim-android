@@ -7,12 +7,15 @@ import android.graphics.RectF;
 import io.jbotsim.core.Color;
 import io.jbotsim.core.Node;
 import io.jbotsim.core.Topology;
+import io.jbotsim.ui.painting.BackgroundPainter;
+import io.jbotsim.ui.painting.UIComponent;
 
 public class DefaultBackgroundPainter implements BackgroundPainter {
     public static final Color DEFAULT_SENSING_RANGE_COLOR = Color.gray;
 
     @Override
-    public void paintBackground(Canvas canvas, Topology topology) {
+    public void paintBackground(UIComponent g2d, Topology topology) {
+        Canvas canvas = (Canvas) g2d.getComponent();
         Paint srPaint = new Paint();
         srPaint.setStyle(Paint.Style.STROKE);
         srPaint.setColor(DEFAULT_SENSING_RANGE_COLOR.getRGB());

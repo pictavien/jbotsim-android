@@ -2,13 +2,16 @@ package io.jbotsim.ui.android.painting;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import io.jbotsim.core.Color;
+
+import io.jbotsim.ui.painting.LinkPainter;
 import io.jbotsim.core.Link;
 import io.jbotsim.core.Topology;
+import io.jbotsim.ui.painting.UIComponent;
 
 public class DefaultLinkPainter implements LinkPainter {
     @Override
-    public void paintLink(Canvas canvas, Link link) {
+    public void paintLink(UIComponent g2d, Link link) {
+        Canvas canvas = (Canvas) g2d.getComponent();
         // TODO
         Integer width = link.getWidth();
         if (width == 0)

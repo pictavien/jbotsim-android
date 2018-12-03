@@ -3,7 +3,6 @@ package io.jbotsim.ui.android.examples.fancy.vectorracer;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.os.Build;
 
 import io.jbotsim.core.Node;
 import io.jbotsim.core.Topology;
@@ -12,7 +11,8 @@ import io.jbotsim.ui.android.AndroidViewerActivity;
 import io.jbotsim.ui.android.ViewerActivityInitializer;
 
 import io.jbotsim.core.Point;
-import io.jbotsim.ui.android.painting.BackgroundPainter;
+import io.jbotsim.ui.painting.BackgroundPainter;
+import io.jbotsim.ui.painting.UIComponent;
 
 public class VectorRacerExample implements ClockListener, BackgroundPainter, ViewerActivityInitializer {
     Topology tp;
@@ -55,7 +55,8 @@ public class VectorRacerExample implements ClockListener, BackgroundPainter, Vie
     }
 
     @Override
-    public void paintBackground(Canvas canvas, Topology topology) {
+    public void paintBackground(UIComponent g2d, Topology topology) {
+        Canvas canvas = (Canvas) g2d.getComponent();
         VectorNode drone = null;
         for (Node node : tp.getNodes())
             if (node instanceof VectorNode)
