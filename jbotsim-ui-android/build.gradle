@@ -14,14 +14,16 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     lintOptions {
         abortOnError false
     }
 }
+
+android.defaultConfig.javaCompileOptions.annotationProcessorOptions.includeCompileClasspath = true
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -32,4 +34,5 @@ dependencies {
     api files('../import/jbotsim-core-1.0-beta10-SNAPSHOT.jar')
     api files('../import/jbotsim-serialization-common-1.0-beta10-SNAPSHOT.jar')
     api files('../import/jbotsim-ui-common-1.0-beta10-SNAPSHOT.jar')
-}
+    implementation 'com.paypal.digraph:digraph-parser:1.0'
+0}
