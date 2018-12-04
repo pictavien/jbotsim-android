@@ -346,11 +346,23 @@ public class AndroidTopologyViewer
 
     private void resizeTopology(int width, int height) {
         tp.setDimensions(width, height);
-        RectF src = new RectF(0.0f, 0.0f, width, height);
-        RectF dst = new RectF(0.0f, 0.0f, getWidth(), getHeight());
         transformMatrix = new Matrix();
-        transformMatrix.setRectToRect(src, dst, Matrix.ScaleToFit.CENTER);
+        updateTransformMatrix(width, height, getWidth(), getHeight());
         redraw();
+    }
+
+    private void updateTransformMatrix(int tpWidth, int tpHeight, int viewWidth, int viewHeight) {
+        RectF src = new RectF(0.0f, 0.0f, tpWidth, tpHeight);
+        RectF dst = new RectF(0.0f, 0.0f, viewWidth, viewHeight);
+        transformMatrix.setRectToRect(src, dst, Matrix.ScaleToFit.CENTER);
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (transformMatrix != null) {
+            updateTransformMatrix(tp.getWidth(), tp.getHeight(), w, h);
+        }
     }
 
     @Override
@@ -361,7 +373,6 @@ public class AndroidTopologyViewer
         if (transformMatrix == null) {
             resetTopologySize();
         }
-
 
         onDrawPaint.setColor(BACKGROUND_COLOR);
         canvas.drawRect(0.0f, 0.0f, getWidth(), getHeight(), onDrawPaint);

@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -117,9 +118,6 @@ public class AndroidViewerActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (savedInstanceState != null)
-            System.err.println("not  null state");
         setContentView(R.layout.topology_viewer);
 
         controller = findViewById(R.id.topologyview);
@@ -130,7 +128,6 @@ public class AndroidViewerActivity
 
         AndroidTopologyViewer.EDGE_DRAW_MODE = false;
     }
-
 
     @Override
     public void onGlobalLayout() {
@@ -163,50 +160,6 @@ public class AndroidViewerActivity
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         controller.getViewTreeObserver().addOnGlobalLayoutListener(this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    private static final String STATE_KEY_MY_TOPOLOGY = "MY_TOPOLOGY";
-    private static final String STATE_KEY_IS_RUNNING = "MY_TOPOLOGY_IS_RUNNING";
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Topology tp = getTopology();
-        boolean isRunning = tp.isRunning();
-        tp.pause();
-        String state = new XMLTopologySerializer().exportTopology(tp);
-        outState.putCharSequence(STATE_KEY_MY_TOPOLOGY, state);
-        outState.putBoolean(STATE_KEY_IS_RUNNING, isRunning);
-        tp.resume();
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        String state = savedInstanceState.getString(STATE_KEY_MY_TOPOLOGY);
-        if (state != null) {
-            boolean isRunning = savedInstanceState.getBoolean(STATE_KEY_IS_RUNNING);
-            Topology tp = new Topology();
-            new XMLTopologySerializer().importTopology(tp, state);
-            if (isRunning)
-                tp.start();
-            setTopology(tp);
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     private void setupSimulationButtons() {
