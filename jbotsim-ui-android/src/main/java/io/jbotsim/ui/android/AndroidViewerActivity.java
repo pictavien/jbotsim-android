@@ -78,7 +78,6 @@ public class AndroidViewerActivity
     private SeekBarMode seekBarMode;
     private HashMap<SeekBarMode, Drawable> bmpCache = new HashMap<>();
 
-    private volatile boolean saveOnExit = false;
     protected ArrayList<CommandListener> commandListeners = new ArrayList<>();
     protected ArrayList<String> commands = new ArrayList<String>();
 
@@ -125,8 +124,6 @@ public class AndroidViewerActivity
 
         setupSimulationButtons();
         setupSeekBar();
-
-        AndroidTopologyViewer.EDGE_DRAW_MODE = false;
     }
 
     @Override
@@ -338,11 +335,6 @@ public class AndroidViewerActivity
         }
     }
 
-    public void longToast(String toast) {
-        System.out.println(toast);
-        Toast.makeText(AndroidViewerActivity.this, toast, Toast.LENGTH_LONG).show();
-    }
-
     public void shortToast(String toast) {
         System.out.println(toast);
         Toast.makeText(AndroidViewerActivity.this, toast, Toast.LENGTH_SHORT).show();
@@ -357,7 +349,6 @@ public class AndroidViewerActivity
         boolean result = true;
 
         if (i == R.id.quit) {
-            saveOnExit = false;
             finish();
         } else if (i == R.id.save) {
             save();
