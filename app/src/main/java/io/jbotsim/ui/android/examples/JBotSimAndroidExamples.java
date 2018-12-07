@@ -10,12 +10,17 @@ import android.view.View;
 import android.widget.Button;
 
 import io.jbotsim.ui.android.examples.R;
+import io.jbotsim.ui.android.examples.centralized.*;
 import io.jbotsim.ui.android.examples.fancy.angularforces.AngularForcesExample;
 import io.jbotsim.ui.android.examples.fancy.canadairs.CanadairsExample;
 import io.jbotsim.ui.android.examples.fancy.parkcleaning.ParkCleaningExample;
 import io.jbotsim.ui.android.examples.fancy.vectorracer.VectorRacerExample;
 import io.jbotsim.ui.android.examples.funny.soccer.SoccerExample;
 import io.jbotsim.ui.android.examples.funny.wolfsheep.WolfSheepExample;
+import io.jbotsim.ui.android.examples.misc.dynamicgraphs.BoundedRecurrent;
+import io.jbotsim.ui.android.examples.misc.dynamicgraphs.EdgeMarkovian;
+import io.jbotsim.ui.android.examples.misc.dynamicgraphs.NbComponentsEG;
+import io.jbotsim.ui.android.examples.misc.dynamicgraphs.PopulationProtocol;
 import io.jbotsim.ui.android.examples.misc.randomwalks.RandomWalkNode;
 import io.jbotsim.ui.android.examples.misc.spanningforest.SpanningForestExample;
 import io.jbotsim.ui.android.examples.misc.mobilitymodels.WayPointMeetingNode;
@@ -58,6 +63,16 @@ public class JBotSimAndroidExamples extends Activity {
         EXAMPLES.put(R.id.wpmeeting, new WayPointMeetingNode());
         EXAMPLES.put(R.id.randomwalk, new RandomWalkNode());
         EXAMPLES.put(R.id.parkcleaning, new ParkCleaningExample());
+        EXAMPLES.put(R.id.coloring, new Coloring.Initializer());
+        EXAMPLES.put(R.id.dijkstra, new Dijkstra.Initializer());
+        EXAMPLES.put(R.id.dominatingset, new DominatingSet.Initializer());
+        EXAMPLES.put(R.id.lmst, new LMST.Initializer());
+        EXAMPLES.put(R.id.mst, new MST.Initializer());
+        EXAMPLES.put(R.id.multiaggregation, new MultiAggregation.Initializer());
+        EXAMPLES.put(R.id.boundedrecurrent, new BoundedRecurrent.Initializer());
+        EXAMPLES.put(R.id.edgemarkovian, new EdgeMarkovian());
+        EXAMPLES.put(R.id.nbcomponentseg, new NbComponentsEG());
+        EXAMPLES.put(R.id.populationprotocol, new PopulationProtocol.Initializer());
     }
 
     public JBotSimAndroidExamples() {
