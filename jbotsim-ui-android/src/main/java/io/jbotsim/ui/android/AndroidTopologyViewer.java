@@ -46,18 +46,17 @@ public class AndroidTopologyViewer
                    ClockListener {
     // TODO this should depend on screen size and or zoom (scale of matrix)
     public final static float USER_MISS_RADIUS = 10;
-    /**
-     * true if the labels should be drawn or not
-     */
-    public static boolean DO_SHOW_LABELS = true;
-    /**
-     * true if the labels should be drawn or not
-     */
-    public static boolean EDGE_DRAW_MODE = true;
     public static final int BACKGROUND_COLOR = Color.LTGRAY;
+
+    /**
+     * true if the labels should be drawn or not
+     */
+    private boolean edgeDrawMode = false;
 
     private static Bitmap defaultNodeIcon = null;
     private String statusInfo = "";
+    private String clientInfo = "";
+
     private Set<Node> userSelectedVertices = new HashSet<>();
     private Set<Link> markedEdges = new HashSet<>();
     private Node deleteVertex = null;
@@ -123,13 +122,13 @@ public class AndroidTopologyViewer
     }
 
     public boolean toggleEdgeDraw() {
-        EDGE_DRAW_MODE = !EDGE_DRAW_MODE;
-        String message = EDGE_DRAW_MODE ? "Draw edges." : "Tap to create vertices.";
+        edgeDrawMode = !edgeDrawMode;
+        String message = edgeDrawMode ? "Draw edges." : "Tap to create vertices.";
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
         clearAll();
         redraw();
 
-        return EDGE_DRAW_MODE;
+        return edgeDrawMode;
 
     }
 
@@ -138,8 +137,16 @@ public class AndroidTopologyViewer
     }
 
     public void setEdgeDrawMode(boolean mode) {
-        if (EDGE_DRAW_MODE != mode)
+        if (edgeDrawMode != mode)
             toggleEdgeDraw();
+    }
+
+    public String getClientInfo() {
+        return clientInfo;
+    }
+
+    public void setClientInfo(String clientInfo) {
+        this.clientInfo = clientInfo;
     }
 
     /**
@@ -416,7 +423,7 @@ public class AndroidTopologyViewer
     }
 
     private void writeStatus(Canvas canvas) {
-        onDrawPaint.setColor(android.graphics.Color.BLACK);
+        onDrawPaint.setColor(Color.BLACK);
         int MY_DIP_VALUE = 12;
 
         float fntSz = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
@@ -424,6 +431,7 @@ public class AndroidTopologyViewer
         onDrawPaint.setTextSize(fntSz);
         Paint.FontMetrics fontMetrics = onDrawPaint.getFontMetrics();
         canvas.drawText(statusInfo,0, -fontMetrics.top, onDrawPaint);
+        canvas.drawText(clientInfo,0, -5*fontMetrics.top/2, onDrawPaint);
     }
 
     public void onNodeAdded(Node n) {
@@ -590,7 +598,7 @@ public class AndroidTopologyViewer
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
             deleteIcon.setVisible(false);
-            if (EDGE_DRAW_MODE) {
+            if (edgeDrawMode) {
 
                 Point sCoordinate = new Point(e.getX(), e.getY());
                 Point gCoordinate = translateCoordinate(sCoordinate);
@@ -671,7 +679,7 @@ public class AndroidTopologyViewer
                     }
                     break;
                 case 1:
-                    if (EDGE_DRAW_MODE) {
+                    if (edgeDrawMode) {
                         Point sCoordinate = new Point(e2.getX(), e2.getY());
                         Point gCoordinate = translateCoordinate(sCoordinate);
                         Node hit = getClosestVertex(gCoordinate, USER_MISS_RADIUS);
