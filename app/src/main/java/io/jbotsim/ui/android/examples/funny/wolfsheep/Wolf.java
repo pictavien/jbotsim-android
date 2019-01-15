@@ -1,12 +1,14 @@
 package io.jbotsim.ui.android.examples.funny.wolfsheep;
 
 import io.jbotsim.core.Node;
-import io.jbotsim.core.PRNG;
+
+import java.util.Random;
 
 /**
  * Created by acasteig on 31/08/16.
  */
 public class Wolf extends Node {
+    private static final Random PRNG = new Random();
     private int speed = 2;
 
     @Override

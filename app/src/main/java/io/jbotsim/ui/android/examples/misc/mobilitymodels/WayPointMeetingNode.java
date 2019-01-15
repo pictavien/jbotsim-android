@@ -1,16 +1,15 @@
 package io.jbotsim.ui.android.examples.misc.mobilitymodels;
 
-import io.jbotsim.core.Node;
-import io.jbotsim.core.PRNG;
 import io.jbotsim.core.Point;
-import io.jbotsim.core.Topology;
 import io.jbotsim.ui.android.NodeClassInitializer;
+
+import java.util.Random;
 
 /**
  * Created by acasteig on 14/06/15.
  */
 public class WayPointMeetingNode extends NodeClassInitializer implements ArrivalListener {
-
+    private static final Random PRNG = new Random();
     Point refPoint;
     WayPointMover mover;
 

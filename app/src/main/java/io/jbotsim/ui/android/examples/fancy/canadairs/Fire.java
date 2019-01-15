@@ -1,12 +1,13 @@
 package io.jbotsim.ui.android.examples.fancy.canadairs;
 
 import io.jbotsim.core.Node;
-import io.jbotsim.core.PRNG;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /* Gardez cette classe telle quelle */
 public class Fire extends Node {
+    private static final Random PRNG = new Random();
     static ArrayList<Fire> allFires = new ArrayList<Fire>();
 
 	public Fire(){

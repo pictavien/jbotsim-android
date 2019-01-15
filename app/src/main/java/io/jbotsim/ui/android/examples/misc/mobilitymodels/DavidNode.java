@@ -1,11 +1,13 @@
 package io.jbotsim.ui.android.examples.misc.mobilitymodels;
 
-import io.jbotsim.core.PRNG;
 import io.jbotsim.core.Point;
 
 import io.jbotsim.ui.android.NodeClassInitializer;
 
+import java.util.Random;
+
 public class DavidNode extends NodeClassInitializer{
+	private static final Random PRNG = new Random();
 	Point vec;
 
     @Override

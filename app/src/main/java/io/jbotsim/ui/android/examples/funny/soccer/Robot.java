@@ -1,12 +1,14 @@
 package io.jbotsim.ui.android.examples.funny.soccer;
 
 import io.jbotsim.core.Node;
-import io.jbotsim.core.PRNG;
+
+import java.util.Random;
 
 /**
  * Created by Arnaud Casteigts on 06/04/17.
  */
 public class Robot extends Node {
+    private static final Random PRNG = new Random();
 
     @Override
     public void onStart() {

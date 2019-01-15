@@ -3,13 +3,15 @@ package io.jbotsim.ui.android.examples.misc.spanningforest;
 import io.jbotsim.core.Color;
 import io.jbotsim.core.Link;
 import io.jbotsim.core.Node;
-import io.jbotsim.core.PRNG;
 import io.jbotsim.core.Topology;
 import io.jbotsim.core.event.ClockListener;
 import io.jbotsim.core.event.ConnectivityListener;
 import io.jbotsim.core.event.TopologyListener;
 
+import java.util.Random;
+
 public class Forest implements ClockListener, ConnectivityListener, TopologyListener{
+	private static final Random PRNG = new Random();
 	Topology tp;
 	
 	public Forest(Topology tp){

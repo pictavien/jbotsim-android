@@ -2,13 +2,16 @@ package io.jbotsim.ui.android.examples.funny.soccer;
 
 import io.jbotsim.core.Node;
 
-import io.jbotsim.core.PRNG;
 import io.jbotsim.core.Point;
+
+import java.util.Random;
 
 /**
  * Created by Arnaud Casteigts on 06/04/17.
  */
 public class Ball extends Node{
+    private static final Random PRNG = new Random();
+
     double speed = 0;
     static final double fadingRatio = 1.2;
 

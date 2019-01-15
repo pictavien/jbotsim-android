@@ -3,12 +3,13 @@ package io.jbotsim.ui.android.examples.basic.mobilebroadcast;
 import io.jbotsim.core.Color;
 import io.jbotsim.core.Message;
 import io.jbotsim.core.Node;
-import io.jbotsim.core.PRNG;
 import io.jbotsim.core.Topology;
 import io.jbotsim.ui.android.TopologyInitializer;
 
-public class MobileBroadcastNode extends Node {
+import java.util.Random;
 
+public class MobileBroadcastNode extends Node {
+    private static final Random PRNG = new Random();
     boolean informed;
 
     @Override

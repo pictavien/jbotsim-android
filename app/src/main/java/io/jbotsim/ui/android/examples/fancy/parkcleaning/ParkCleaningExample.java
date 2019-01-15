@@ -1,7 +1,6 @@
 package io.jbotsim.ui.android.examples.fancy.parkcleaning;
 
 import io.jbotsim.core.Node;
-import io.jbotsim.core.PRNG;
 import io.jbotsim.core.Topology;
 import io.jbotsim.core.event.ClockListener;
 import io.jbotsim.core.event.TopologyListener;
@@ -9,7 +8,11 @@ import io.jbotsim.core.event.TopologyListener;
 import io.jbotsim.core.Point;
 import io.jbotsim.ui.android.TopologyInitializer;
 
+import java.util.Random;
+
 public class ParkCleaningExample implements TopologyListener, ClockListener, TopologyInitializer {
+    private static final Random PRNG = new Random();
+
     Topology tp;
     Point dim;
     boolean selective = true; // moves only the nodes whose "type" property is "rwp"

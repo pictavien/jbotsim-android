@@ -1,13 +1,15 @@
 package io.jbotsim.ui.android.examples.funny.wolfsheep;
 
 import io.jbotsim.core.Node;
-import io.jbotsim.core.PRNG;
 import io.jbotsim.core.Topology;
+
+import java.util.Random;
 
 /**
  * Created by acasteig on 31/08/16.
  */
 public class Sheep extends Node {
+    private static final Random PRNG = new Random();
     private int speed = 1;
     private boolean isAlive = true;
 

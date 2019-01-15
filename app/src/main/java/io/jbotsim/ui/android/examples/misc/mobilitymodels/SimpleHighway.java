@@ -1,13 +1,15 @@
 package io.jbotsim.ui.android.examples.misc.mobilitymodels;
 
 import io.jbotsim.core.Node;
-import io.jbotsim.core.PRNG;
 import io.jbotsim.core.Topology;
 import io.jbotsim.core.event.ClockListener;
 import io.jbotsim.core.event.TopologyListener;
 import io.jbotsim.ui.android.TopologyInitializer;
 
+import java.util.Random;
+
 public class SimpleHighway implements ClockListener, TopologyListener, TopologyInitializer {
+	private static final Random PRNG = new Random();
 	Topology tp;
 	boolean voie=true;
 
