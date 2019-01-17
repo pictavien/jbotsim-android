@@ -47,11 +47,11 @@ public class JBotSimAndroidExamples extends Activity {
         EXAMPLES.put(R.id.movingnodes, new MovingNode.Initializer());
         EXAMPLES.put(R.id.broadcastingnodes, new BroadcastingNode.Initializer());
         EXAMPLES.put(R.id.mobilebroadcastnodes, new MobileBroadcastNode.Initializer());
-        EXAMPLES.put(R.id.spanningtreenodes , new SpanningTreeNode.Initializer());
-        EXAMPLES.put(R.id.cowboy , new CowboyExample());
-        EXAMPLES.put(R.id.soccer , new SoccerExample());
-        EXAMPLES.put(R.id.wolfsheep , new WolfSheepExample());
-        EXAMPLES.put(R.id.angularforces , new AngularForcesExample());
+        EXAMPLES.put(R.id.spanningtreenodes, new SpanningTreeNode.Initializer());
+        EXAMPLES.put(R.id.cowboy, new CowboyExample());
+        EXAMPLES.put(R.id.soccer, new SoccerExample());
+        EXAMPLES.put(R.id.wolfsheep, new WolfSheepExample());
+        EXAMPLES.put(R.id.angularforces, new AngularForcesExample());
         EXAMPLES.put(R.id.canadairs, new CanadairsExample());
         EXAMPLES.put(R.id.vectorracer, new VectorRacerExample());
         EXAMPLES.put(R.id.spanningforest, new SpanningForestExample());

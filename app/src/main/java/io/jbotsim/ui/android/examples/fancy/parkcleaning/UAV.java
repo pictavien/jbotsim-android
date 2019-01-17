@@ -2,7 +2,7 @@ package io.jbotsim.ui.android.examples.fancy.parkcleaning;
 
 import io.jbotsim.core.Node;
 
-public class UAV extends Node{
+public class UAV extends Node {
 	public UAV(){
 		this.setCommunicationRange(100);
 		this.setSensingRange(40);

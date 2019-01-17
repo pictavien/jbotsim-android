@@ -9,7 +9,7 @@ import java.util.Random;
 /**
  * Created by Arnaud Casteigts on 06/04/17.
  */
-public class Ball extends Node{
+public class Ball extends Node {
     private static final Random PRNG = new Random();
 
     double speed = 0;

@@ -49,12 +49,12 @@ public class Angles {
         return angle;
     }
     public static ArrayList<Node> orderByAngleToReferenceNode(Node refNode, ArrayList<Node> nodes){
-        Hashtable<Double, Node> tmp=new Hashtable<Double, Node>();
+        Hashtable<Double, Node> tmp= new Hashtable<>();
         for (Node ng : nodes)
             tmp.put(getAngle(refNode,ng), ng);
-        ArrayList<Double> angles=new ArrayList<Double>(tmp.keySet());
+        ArrayList<Double> angles= new ArrayList<>(tmp.keySet());
         Collections.sort(angles);
-        ArrayList<Node> result=new ArrayList<Node>();
+        ArrayList<Node> result= new ArrayList<>();
         for (Double angle : angles)
             result.add(tmp.get(angle));
         return result;

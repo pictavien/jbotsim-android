@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 @SuppressWarnings("unchecked")
-public class Robot extends Node{
+public class Robot extends Node {
 	public static double epsilon = 0.0025; // don't move under this value
 	public static double dmax = 1; // Vmax / round-duration
 	

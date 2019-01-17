@@ -2,7 +2,7 @@ package io.jbotsim.ui.android.examples.funny.cowboy;
 
 import io.jbotsim.core.Node;
 
-public class Cow extends Node{
+public class Cow extends Node {
     static Node farmer;
     int speed = 0;
 
