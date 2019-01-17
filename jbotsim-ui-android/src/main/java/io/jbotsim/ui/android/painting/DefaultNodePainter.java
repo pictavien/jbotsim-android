@@ -1,10 +1,5 @@
 package io.jbotsim.ui.android.painting;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.RectF;
 
 import io.jbotsim.core.Node;
 import io.jbotsim.ui.painting.NodePainter;

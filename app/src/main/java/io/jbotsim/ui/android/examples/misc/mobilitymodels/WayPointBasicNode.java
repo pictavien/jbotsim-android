@@ -1,6 +1,5 @@
 package io.jbotsim.ui.android.examples.misc.mobilitymodels;
 
-import io.jbotsim.core.Topology;
 import io.jbotsim.core.Point;
 import io.jbotsim.ui.android.NodeClassInitializer;
 

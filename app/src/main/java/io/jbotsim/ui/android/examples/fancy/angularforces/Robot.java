@@ -2,7 +2,6 @@ package io.jbotsim.ui.android.examples.fancy.angularforces;
 
 import io.jbotsim.core.Message;
 import io.jbotsim.core.Node;
-import io.jbotsim.core.Topology;
 
 import io.jbotsim.core.Point;
 import java.util.ArrayList;
