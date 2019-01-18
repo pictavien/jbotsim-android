@@ -3,6 +3,7 @@ package io.jbotsim.ui.android.examples;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -75,6 +76,8 @@ public class JBotSimAndroidExamples extends Activity {
         EXAMPLES.put(R.id.populationprotocol, new PopulationProtocol.Initializer());
     }
 
+    private final String TAG = getClass().getName();
+
     public JBotSimAndroidExamples() {
         super();
     }
@@ -84,23 +87,28 @@ public class JBotSimAndroidExamples extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(View.inflate(this, R.layout.examples, null));
 
-        for(int id : EXAMPLES.keySet()) {
+        for (int id : EXAMPLES.keySet()) {
             View button = findViewById(id);
             final int ident = id;
-            if (button != null) {
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(JBotSimAndroidExamples.this, AndroidViewerActivity.class);
-                        String className = EXAMPLES.get(ident).getClass().getName();
-                        intent.putExtra(getPackageName()+".EXTRA_INIT_CLASS", className);
-                        intent.putExtra(getPackageName()+".EXTRA_NAME", ((Button) v).getText());
+            final Object initObj = EXAMPLES.get(ident);
 
-                        startActivity(intent);
-                        System.out.println("Invoking "+ className);
-                    }
-                });
+            if (button == null || initObj == null) {
+                Log.e(TAG, "invalid button identifier :" + id);
+                continue;
             }
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Class c = initObj.getClass();
+                    String className = c.getName();
+                    Intent intent = new Intent(JBotSimAndroidExamples.this, AndroidViewerActivity.class);
+                    intent.putExtra(getPackageName() + ".EXTRA_INIT_CLASS", className);
+                    intent.putExtra(getPackageName() + ".EXTRA_NAME", ((Button) v).getText());
+
+                    startActivity(intent);
+                    System.out.println("Invoking " + className);
+                }
+            });
         }
 
         /**

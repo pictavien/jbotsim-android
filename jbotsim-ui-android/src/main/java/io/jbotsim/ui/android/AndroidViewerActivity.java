@@ -114,15 +114,18 @@ public class AndroidViewerActivity
         try {
             Intent intent = getIntent();
             Bundle extras = intent.getExtras();
+            if(extras == null)
+                return;
             if (extras.containsKey(getPackageName() + ".EXTRA_URI")) {
                 load((Uri) extras.get(getPackageName() + ".EXTRA_URI"));
             } else {
                 String title = extras.getString(getPackageName() + ".EXTRA_NAME");
                 setTitle(title);
                 String initClassName = extras.getString(getPackageName() + ".EXTRA_INIT_CLASS");
+                if (initClassName == null)
+                    return;
                 Class initClass = Class.forName(initClassName);
-                Object init = null;
-                init = initClass.newInstance();
+                Object init = initClass.newInstance();
                 if (init instanceof TopologyInitializer) {
                     ((TopologyInitializer) init).initialize(getTopology());
                 } else if (init instanceof ViewerActivityInitializer) {
@@ -189,7 +192,8 @@ public class AndroidViewerActivity
     private Drawable getDrawableForSeekBarMode (SeekBarMode mode) {
         if (mode == SeekBarMode.NONE)
             return null;
-        Drawable result = null;
+
+        Drawable result;
 
         if (bmpCache.containsKey(mode)) {
             result = bmpCache.get(mode);
@@ -373,10 +377,13 @@ public class AndroidViewerActivity
             return;
         }
 
-        if (requestCode == CHOOSE_FILENAME_REQUEST_CODE) {
-            load(resultData.getData());
-        } else if (requestCode == CREATE_FILENAME_REQUEST_CODE) {
-            save(resultData.getData());
+        Uri data = resultData.getData();
+        if (data != null) {
+            if (requestCode == CHOOSE_FILENAME_REQUEST_CODE) {
+                load(data);
+            } else if (requestCode == CREATE_FILENAME_REQUEST_CODE) {
+                save(data);
+            }
         }
     }
 
