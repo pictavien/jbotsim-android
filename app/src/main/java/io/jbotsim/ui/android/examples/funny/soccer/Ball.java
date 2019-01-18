@@ -3,6 +3,8 @@ package io.jbotsim.ui.android.examples.funny.soccer;
 import io.jbotsim.core.Node;
 
 import io.jbotsim.core.Point;
+import io.jbotsim.ui.android.examples.R;
+import io.jbotsim.ui.android.utils.Icon;
 
 import java.util.Random;
 
@@ -17,7 +19,7 @@ public class Ball extends Node {
 
     @Override
     public void onStart() {
-        setIcon("ball");
+        setIcon(Icon.getResourceURI(R.drawable.ball));
         disableWireless();
     }
 

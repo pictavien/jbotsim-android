@@ -1,6 +1,8 @@
 package io.jbotsim.ui.android.examples.funny.wolfsheep;
 
 import io.jbotsim.core.Node;
+import io.jbotsim.ui.android.examples.R;
+import io.jbotsim.ui.android.utils.Icon;
 
 import java.util.Random;
 
@@ -13,7 +15,7 @@ public class Wolf extends Node {
 
     @Override
     public void onStart() {
-        setIcon("wolf");
+        setIcon(Icon.getResourceURI(R.drawable.wolf));
         setSize(20);
         setSensingRange(50);
         setDirection(PRNG.nextDouble() * Math.PI * 2);

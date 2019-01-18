@@ -4,6 +4,9 @@ import io.jbotsim.core.Message;
 import io.jbotsim.core.Node;
 
 import io.jbotsim.core.Point;
+import io.jbotsim.ui.android.examples.R;
+import io.jbotsim.ui.android.utils.Icon;
+
 import java.util.Stack;
 
 public class Canadair extends Node {
@@ -14,7 +17,7 @@ public class Canadair extends Node {
     Point lake = new Point(50,50);
 
     public Canadair(){
-        setIcon("canadair");
+        setIcon(Icon.getResourceURI(R.drawable.canadair));
         setSize(18);
         setCommunicationRange(120);
         setSensingRange(30);

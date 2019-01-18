@@ -1,12 +1,14 @@
 package io.jbotsim.ui.android.examples.fancy.parkcleaning;
 
 import io.jbotsim.core.Node;
+import io.jbotsim.ui.android.examples.R;
+import io.jbotsim.ui.android.utils.Icon;
 
 public class UAV extends Node {
 	public UAV(){
 		this.setCommunicationRange(100);
 		this.setSensingRange(40);
-		this.setIcon("gmuav");
+		this.setIcon(Icon.getResourceURI(R.drawable.gmuav));
 		this.setSize(20);
 		this.setProperty("type", "rwp");
 		this.setDirection(2);

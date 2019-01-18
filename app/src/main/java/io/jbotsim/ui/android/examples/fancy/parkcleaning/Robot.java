@@ -4,6 +4,9 @@ import io.jbotsim.core.Node;
 import io.jbotsim.core.event.ClockListener;
 
 import io.jbotsim.core.Point;
+import io.jbotsim.ui.android.examples.R;
+import io.jbotsim.ui.android.utils.Icon;
+
 import java.util.List;
 
 public class Robot extends Node implements ClockListener{
@@ -11,7 +14,7 @@ public class Robot extends Node implements ClockListener{
 	double step = 1;
 	
 	public Robot(){
-	    setIcon("gmrobot");
+	    setIcon(Icon.getResourceURI(R.drawable.gmrobot));
 		setSize(10);
 		setSensingRange(30);
 		disableWireless();

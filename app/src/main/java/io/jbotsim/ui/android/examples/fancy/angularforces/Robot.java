@@ -4,6 +4,9 @@ import io.jbotsim.core.Message;
 import io.jbotsim.core.Node;
 
 import io.jbotsim.core.Point;
+import io.jbotsim.ui.android.examples.R;
+import io.jbotsim.ui.android.utils.Icon;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -13,7 +16,7 @@ public class Robot extends Node {
 	public static double dmax = 1; // Vmax / round-duration
 	
 	public Robot() {
-	    setIcon("angularforces_robot");
+		setIcon(Icon.getResourceURI(R.drawable.angularforces_robot));
 		setSize(18);
 		setProperty("oldpos", getLocation());
 	}
