@@ -267,10 +267,6 @@ public class AndroidTopologyViewer
         return toggleEdge(v, u, true);
     }
 
-    public void centralize() {
-        // TODO
-    }
-
     public void addBackgroundPainter(BackgroundPainter painter) {
         backgroundPainters.add(0, painter);
     }
@@ -503,7 +499,7 @@ public class AndroidTopologyViewer
         private Point[] previousPointerCoords = null;
         private boolean popuprunning = false;
 
-        public EventHandler() {
+        EventHandler() {
             gd = new GestureDetector(getContext(), this);
         }
 
@@ -521,7 +517,7 @@ public class AndroidTopologyViewer
             return super.onDown(e);
         }
 
-        public Point clearCoordinate() {
+        Point clearCoordinate() {
             Point ret = startCoordinate;
             startCoordinate = null;
             return ret;
@@ -564,7 +560,7 @@ public class AndroidTopologyViewer
                     popuprunning = false;
                 }
             });
-            ListView lv = (ListView) popupModels.findViewById(R.id.nodemodels_list);
+            ListView lv = popupModels.findViewById(R.id.nodemodels_list);
             final List<String> models = new ArrayList<>(getTopology().getModelsNames());
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout
                     .nodemodels_entry, models);
@@ -722,8 +718,6 @@ public class AndroidTopologyViewer
 
                         } else {
                             deleteIcon.setVisible(false);
-//                            if (previousPointerCount == 1)
-//                                getTransformMatrix().postTranslate(-distanceX, -distanceY);
                         }
 
                     }
@@ -763,8 +757,7 @@ public class AndroidTopologyViewer
     }
 
     private class DeleteIcon {
-        private final Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
-                R.drawable.trash64x64);
+        private final Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.trash64x64);
         private RectF loc = new RectF();
         private boolean isOver = false;
         private boolean visible = false;
@@ -777,7 +770,7 @@ public class AndroidTopologyViewer
             setLocation(x, y);
         }
 
-        public boolean isOver() {
+        boolean isOver() {
             return isOver;
         }
 
@@ -814,7 +807,6 @@ public class AndroidTopologyViewer
 
                 canvas.drawOval(new RectF(loc.left - hw, loc.top - hh, loc.right + hw,
                         loc.bottom + hh), bgPaint);
-                //canvas.drawBitmap(trashBgRedBitmap, trashX - 46, trashY - 46, trashPaint);
             } else {
                 canvas.drawBitmap(bitmap, loc.left, loc.top, null);
             }

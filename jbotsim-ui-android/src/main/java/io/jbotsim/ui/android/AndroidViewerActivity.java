@@ -44,15 +44,15 @@ public class AndroidViewerActivity
         SENSING_RANGE(R.drawable.sensing_range_thumb),
         CLOCKSPEED(R.drawable.clock_speed_thumb);
 
-        private int mode;
+        private final int mode;
         SeekBarMode(int m) {
             mode = m;
         }
 
-        public int getIntValue() {
+        int getIntValue() {
             return mode;
         }
-    };
+    }
 
     private static final int SEEKBAR_MAX_PERIOD = 40;
     private SeekBar seekBar = null;
@@ -60,7 +60,7 @@ public class AndroidViewerActivity
     private HashMap<SeekBarMode, Drawable> bmpCache = new HashMap<>();
 
     protected ArrayList<CommandListener> commandListeners = new ArrayList<>();
-    protected ArrayList<String> commands = new ArrayList<String>();
+    protected ArrayList<String> commands = new ArrayList<>();
 
     public AndroidViewerActivity() {
         this(new Topology());
@@ -196,7 +196,7 @@ public class AndroidViewerActivity
         } else {
             Bitmap bmp = BitmapFactory.decodeResource(getResources(), mode.getIntValue());
             Matrix m = new Matrix();
-            float ratio = (float) (0.5f*seekBar.getHeight())/ (float) bmp.getHeight();
+            float ratio = (0.5f*seekBar.getHeight())/ (float) bmp.getHeight();
             m.setScale(ratio, ratio);
             bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), m, true);
             result = new BitmapDrawable(getResources(), bmp);
@@ -224,7 +224,7 @@ public class AndroidViewerActivity
                         getTopology().setCommunicationRange(progress);
                         break;
                     default:
-                        if(BuildConfig.DEBUG && !(seekBarMode != SeekBarMode.NONE)) {
+                        if(BuildConfig.DEBUG && seekBarMode == SeekBarMode.NONE) {
                             throw new AssertionError();
                         }
                         break;
