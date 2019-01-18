@@ -734,6 +734,7 @@ public class AndroidTopologyViewer
         }
 
         public boolean onTouch(View view, MotionEvent event) {
+            performClick();
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 if (deleteIcon.isOver()) {
                     if (deleteVertex != null) {
