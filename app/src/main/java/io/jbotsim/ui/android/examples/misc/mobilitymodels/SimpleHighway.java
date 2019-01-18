@@ -11,7 +11,7 @@ import java.util.Random;
 public class SimpleHighway implements ClockListener, TopologyListener, TopologyInitializer {
 	private static final Random PRNG = new Random();
 	Topology tp;
-	boolean voie=true;
+	boolean lane = true;
 
 	@Override
 	public boolean initialize(Topology topology) {
@@ -22,10 +22,10 @@ public class SimpleHighway implements ClockListener, TopologyListener, TopologyI
 	}
 
 	public void onNodeAdded(Node n) {
-		n.setProperty("speed", Double.valueOf(PRNG.nextDouble()*50+30));
-		n.setLocation(n.getX(),voie?200:186);
+		n.setProperty("speed", PRNG.nextDouble() * 50 + 30);
+		n.setLocation(n.getX(),lane ?200:186);
 		n.setDirection(0);
-        voie=!voie;
+        lane =!lane ;
 	}
 	public void onClock() {
 		for (Node n : tp.getNodes()){

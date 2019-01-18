@@ -42,7 +42,9 @@ import io.jbotsim.ui.android.examples.funny.cowboy.CowboyExample;
 import java.util.HashMap;
 
 public class JBotSimAndroidExamples extends Activity {
-    private static HashMap<Integer,Object> EXAMPLES;
+    private static final HashMap<Integer, Object> EXAMPLES;
+    private static final int CHOOSE_FILENAME_REQUEST_CODE = 12345;
+
     static {
         EXAMPLES = new HashMap<>();
         EXAMPLES.put(R.id.movingnodes, new MovingNode.Initializer());
@@ -155,20 +157,16 @@ public class JBotSimAndroidExamples extends Activity {
         return true;
     }
 
-    private static final int CHOOSE_FILENAME_REQUEST_CODE = 12345;
-
     @Override
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent resultData) {
 
-        if (requestCode == CHOOSE_FILENAME_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Uri uri = null;
-            if (resultData != null) {
-                uri = resultData.getData();
-                Intent intent = new Intent(JBotSimAndroidExamples.this, AndroidViewerActivity.class);
-                intent.putExtra(getPackageName()+".EXTRA_URI", uri);
-                startActivity(intent);
-            }
+        if (requestCode == CHOOSE_FILENAME_REQUEST_CODE && resultCode == Activity.RESULT_OK &&
+                resultData != null) {
+            Uri uri = resultData.getData();
+            Intent intent = new Intent(JBotSimAndroidExamples.this, AndroidViewerActivity.class);
+            intent.putExtra(getPackageName() + ".EXTRA_URI", uri);
+            startActivity(intent);
         }
     }
 

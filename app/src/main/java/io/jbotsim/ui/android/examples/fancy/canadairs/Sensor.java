@@ -37,7 +37,7 @@ public class Sensor extends Node {
     @Override
     public void onSensingOut(Node node) {
         if (node instanceof Fire){
-            sensedFires.remove((Fire)node);
+            sensedFires.remove(node);
         }
 
         if (sensedFires.isEmpty()){

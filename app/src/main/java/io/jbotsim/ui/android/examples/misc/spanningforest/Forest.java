@@ -44,10 +44,10 @@ public class Forest implements ClockListener, ConnectivityListener, TopologyList
 	@Override
 	public void onLinkRemoved(Link l) {
 		// Si arête de l'arbre dans un sens
-		if ((Node)l.endpoints().get(0).getProperty("parent")==l.endpoints().get(1))
+		if (l.endpoints().get(0).getProperty("parent")==l.endpoints().get(1))
 			setDefaultState(l.endpoints().get(0));
 		// dans l'autre sens
-		else if ((Node)l.endpoints().get(1).getProperty("parent")==l.endpoints().get(0))
+		else if (l.endpoints().get(1).getProperty("parent")==l.endpoints().get(0))
 			setDefaultState(l.endpoints().get(1));
 		// Sinon je fais rien
 	}	

@@ -56,7 +56,7 @@ public class Station extends Node {
                 Canadair choosenOne = null;
                 while (it.hasNext() && !found) {
                     Map.Entry pair = (Map.Entry)it.next();
-                    if (!destinationByCanadair.containsKey((Canadair)pair.getKey())){
+                    if (!destinationByCanadair.containsKey(pair.getKey())){
                         found = true;
                         choosenOne = (Canadair) pair.getKey();
                     }

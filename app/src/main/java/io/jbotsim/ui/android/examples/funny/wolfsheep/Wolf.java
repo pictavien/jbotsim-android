@@ -11,7 +11,7 @@ import java.util.Random;
  */
 public class Wolf extends Node {
     private static final Random PRNG = new Random();
-    private int speed = 2;
+    private static final int SPEED = 2;
 
     @Override
     public void onStart() {
@@ -23,7 +23,7 @@ public class Wolf extends Node {
 
     @Override
     public void onClock() {
-        move(speed);
+        move(SPEED);
         wrapLocation();
     }
 

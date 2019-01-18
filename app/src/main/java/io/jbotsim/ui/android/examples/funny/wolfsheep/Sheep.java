@@ -13,7 +13,7 @@ import io.jbotsim.ui.android.utils.Icon;
  */
 public class Sheep extends Node {
     private static final Random PRNG = new Random();
-    private int speed = 1;
+    private static final int SPEED = 1;
     private boolean isAlive = true;
 
     @Override
@@ -25,7 +25,7 @@ public class Sheep extends Node {
 
     @Override
     public void onClock() {
-        move(speed);
+        move(SPEED);
         wrapLocation();
     }
 

@@ -36,10 +36,8 @@ public class VectorRacerExample implements ClockListener, BackgroundPainter, Vie
     }
 
     public boolean hasReturned(VectorNode drone) {
-        if (drone.getLocation().equals(startPoint) && drone.vector.distance(new Point(0, 0)) < VectorNode.DEVIATION) {
-            return true;
-        } else
-            return false;
+        return (drone.getLocation().equals(startPoint) &&
+                drone.vector.distance(new Point(0, 0)) < VectorNode.DEVIATION);
     }
 
     @Override
@@ -73,7 +71,7 @@ public class VectorRacerExample implements ClockListener, BackgroundPainter, Vie
         canvas.drawOval(new RectF(l, t, r, b), pt);
 
         if (score != null) {
-            String s = "Score: " + Integer.toString(score);
+            String s = "Score: " + score;
             float x = (float) (drone.getX() + 30);
             float y = (float) (drone.getY() + 30);
             canvas.drawText(s, x, y, pt);
