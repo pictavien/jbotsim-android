@@ -68,7 +68,6 @@ public class AndroidTopologyViewer
 
     private DeleteIcon deleteIcon = null;
 
-    private EventHandler evh;
     private UIComponent g2d = new UIComponent(null);
     private Integer initialWidth = null;
     private Integer initialHeight = null;
@@ -83,7 +82,7 @@ public class AndroidTopologyViewer
 
         tp = null;
         setFocusable(true);
-        evh = new EventHandler();
+        EventHandler evh = new EventHandler();
         setOnClickListener(evh);
         setOnTouchListener(evh);
         resetPainters();
