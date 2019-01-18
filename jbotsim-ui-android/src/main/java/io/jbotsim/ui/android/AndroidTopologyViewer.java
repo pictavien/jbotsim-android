@@ -52,7 +52,6 @@ public class AndroidTopologyViewer
      */
     private boolean edgeDrawMode = false;
 
-    private static Bitmap defaultNodeIcon = null;
     private String statusInfo = "";
     private String clientInfo = "";
 
@@ -86,7 +85,6 @@ public class AndroidTopologyViewer
         setOnClickListener(evh);
         setOnTouchListener(evh);
         resetPainters();
-        defaultNodeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.nodeicon);
     }
 
     public void resetPainters() {
@@ -435,11 +433,6 @@ public class AndroidTopologyViewer
 
     public void onNodeAdded(Node n) {
         n.addPropertyListener(this);
-        if (n.getIcon() == null)
-            n.setProperty(DefaultNodePainter.NODE_ICON_BITMAP_PROPERTY, defaultNodeIcon);
-        else
-            n.setProperty("icon", n.getIcon());
-        redraw();
     }
 
     public void onNodeRemoved(Node n) {
@@ -462,19 +455,10 @@ public class AndroidTopologyViewer
     public void onPropertyChanged(Properties o, String property) {
         if (o instanceof Node) {
             Node n = (Node) o;
-            redraw();
-				/*if (property.equals("color")) {
-					jn.updateUI();
-				} else  else if (property.equals("size")) {
-					jn.updateIcon();
-				} */
             if (property.equals("icon")) {
-                Resources rsrc = getResources();
-                int id = rsrc.getIdentifier(n.getIcon(), "drawable", getContext().getPackageName());
-                Bitmap icon = BitmapFactory.decodeResource(rsrc, id);
-                n.setProperty(DefaultNodePainter.NODE_ICON_BITMAP_PROPERTY, icon);
-                redraw();
+                n.removeProperty(DefaultNodePainter.NODE_ICON_BITMAP_PROPERTY);
             }
+            redraw();
         } else if (property.equals("width") || property.equals("color")) {
             redraw();
         }
