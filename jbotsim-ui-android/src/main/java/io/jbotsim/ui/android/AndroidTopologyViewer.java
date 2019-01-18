@@ -69,7 +69,7 @@ public class AndroidTopologyViewer
     private DeleteIcon deleteIcon = null;
 
     private EventHandler evh;
-    private UIComponent g2d = new UIComponent();
+    private UIComponent g2d = new UIComponent(null);
     private Integer initialWidth = null;
     private Integer initialHeight = null;
     private Paint onDrawPaint = new Paint();
@@ -367,10 +367,15 @@ public class AndroidTopologyViewer
         }
     }
 
+    private void setComponent(Canvas canvas) {
+        g2d = new UIComponent(canvas);
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        g2d.setComponent(canvas);
+
+        setComponent(canvas);
 
         if (transformMatrix == null) {
             resetTopologySize();
