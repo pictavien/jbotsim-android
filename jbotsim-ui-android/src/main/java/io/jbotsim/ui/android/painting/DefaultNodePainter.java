@@ -11,7 +11,7 @@ import java.io.InputStream;
 
 public class DefaultNodePainter implements NodePainter {
     public static final String NODE_ICON_BITMAP_PROPERTY = "icon-bitmap";
-    public static final String DEFAULT_NODE_ICON = "/io/jbotsim/ui/circle.png";
+    public static final String DEFAULT_NODE_ICON = "/io/jbotsim/ui/default-node-icon.png";
 
     @Override
     public void paintNode(UIComponent g2d, Node node) {
