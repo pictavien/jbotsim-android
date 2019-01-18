@@ -26,13 +26,12 @@ android {
 android.defaultConfig.javaCompileOptions.annotationProcessorOptions.includeCompileClasspath = true
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    //implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:28.0.0'
+
+    api "${jbotsimGroup}:jbotsim-all:${jbotsimVersion}"
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    api files('../import/jbotsim-core-1.0-beta10-SNAPSHOT.jar')
-    api files('../import/jbotsim-serialization-common-1.0-beta10-SNAPSHOT.jar')
-    api files('../import/jbotsim-ui-common-1.0-beta10-SNAPSHOT.jar')
-    implementation 'com.paypal.digraph:digraph-parser:1.0'
-0}
+}
