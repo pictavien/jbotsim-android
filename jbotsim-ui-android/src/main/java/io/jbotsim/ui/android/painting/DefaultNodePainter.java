@@ -8,10 +8,12 @@ import io.jbotsim.ui.painting.UIComponent;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 
 public class DefaultNodePainter implements NodePainter {
     public static final String NODE_ICON_BITMAP_PROPERTY = "icon-bitmap";
     public static final String DEFAULT_NODE_ICON = "/io/jbotsim/ui/default-node-icon.png";
+    private static final HashMap<String, Bitmap> bmpCache = new HashMap<>();
 
     @Override
     public void paintNode(UIComponent g2d, Node node) {
@@ -55,16 +57,23 @@ public class DefaultNodePainter implements NodePainter {
         if (result != null)
             return result;
 
-        String iconLoc = node.getIcon();
-        if (iconLoc == null)
-            iconLoc = DEFAULT_NODE_ICON;
         try {
-            InputStream inputStream = node.getTopology().getFileManager().getInputStreamForName(iconLoc);
-            result = BitmapFactory.decodeStream(inputStream, null, null);
+            String iconLoc = node.getIcon();
+            if (iconLoc == null)
+                iconLoc = DEFAULT_NODE_ICON;
+
+            if(bmpCache.containsKey(iconLoc)) {
+                result = bmpCache.get(iconLoc);
+            } else {
+                InputStream inputStream = node.getTopology().getFileManager().getInputStreamForName(iconLoc);
+                result = BitmapFactory.decodeStream(inputStream, null, null);
+                bmpCache.put(iconLoc, result);
+            }
             node.setProperty(DefaultNodePainter.NODE_ICON_BITMAP_PROPERTY, result);
-        } catch (IOException e) {
+        } catch(IOException e) {
             e.printStackTrace();
         }
+
         return result;
     }
 }
