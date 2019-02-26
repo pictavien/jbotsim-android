@@ -14,10 +14,10 @@ public class Robot extends Node {
 
     @Override
     public void onStart() {
-        setSize(14);
+        setIconSize(14);
         setIcon(Icon.getResourceURI(R.drawable.soccer_robot));
         setDirection(PRNG.nextDouble()*Math.PI*2.0);
-        setSensingRange(getSize()+10);
+        setSensingRange(getIconSize()+10);
     }
 
     @Override

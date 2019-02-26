@@ -8,6 +8,6 @@ public class Garbage extends Node {
 	public Garbage(){
 		disableWireless();
 		setIcon(Icon.getResourceURI(R.drawable.gmgarbage));
-		setSize(12);
+		setIconSize(12);
 	}
 }

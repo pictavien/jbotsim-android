@@ -12,6 +12,6 @@ public class Lake extends Node {
     public Lake(){
         disableWireless();
         setIcon(Icon.getResourceURI(R.drawable.lake));
-        setSize(45);
+        setIconSize(45);
     }
 }

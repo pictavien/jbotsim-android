@@ -10,7 +10,7 @@ import io.jbotsim.ui.android.utils.Icon;
 public class Farmer extends Node {
     public Farmer() {
         setIcon(Icon.getResourceURI(R.drawable.farmer));
-        setSize(30);
+        setIconSize(30);
         disableWireless();
     }
 }

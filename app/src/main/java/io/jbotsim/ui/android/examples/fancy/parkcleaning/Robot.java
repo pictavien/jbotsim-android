@@ -15,7 +15,7 @@ public class Robot extends Node implements ClockListener{
 	
 	public Robot(){
 	    setIcon(Icon.getResourceURI(R.drawable.gmrobot));
-		setSize(10);
+		setIconSize(10);
 		setSensingRange(30);
 		disableWireless();
 	}		

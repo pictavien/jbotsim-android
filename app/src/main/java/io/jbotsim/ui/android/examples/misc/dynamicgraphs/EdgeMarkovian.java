@@ -2,8 +2,8 @@ package io.jbotsim.ui.android.examples.misc.dynamicgraphs;
 
 import io.jbotsim.core.Node;
 import io.jbotsim.core.Topology;
-import io.jbotsim.dynamicity.graph.EMEGPlayer;
-import io.jbotsim.dynamicity.graph.TVG;
+import io.jbotsim.gen.dynamic.graph.EMEGPlayer;
+import io.jbotsim.gen.dynamic.graph.TVG;
 import io.jbotsim.ui.android.TopologyInitializer;
 
 public class EdgeMarkovian implements TopologyInitializer {

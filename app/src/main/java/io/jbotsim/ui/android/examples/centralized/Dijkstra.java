@@ -1,6 +1,6 @@
 package io.jbotsim.ui.android.examples.centralized;
 
-import io.jbotsim.Connectivity;
+import io.jbotsim.contrib.algos.Connectivity;
 import io.jbotsim.core.Link;
 import io.jbotsim.core.Node;
 import io.jbotsim.core.Topology;

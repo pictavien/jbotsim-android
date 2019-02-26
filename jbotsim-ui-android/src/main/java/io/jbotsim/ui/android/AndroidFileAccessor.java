@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import android.os.ParcelFileDescriptor;
-import io.jbotsim.core.io.FileManager;
+import io.jbotsim.io.FileManager;
 
 public class AndroidFileAccessor
         extends FileManager {

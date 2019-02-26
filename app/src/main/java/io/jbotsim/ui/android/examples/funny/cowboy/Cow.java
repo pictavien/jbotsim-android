@@ -10,7 +10,7 @@ public class Cow extends Node {
 
     public Cow(){
         setIcon(Icon.getResourceURI(R.drawable.cow));
-        setSize(30);
+        setIconSize(30);
         disableWireless();
     }
 

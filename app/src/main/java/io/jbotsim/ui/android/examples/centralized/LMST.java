@@ -1,6 +1,6 @@
 package io.jbotsim.ui.android.examples.centralized;
 
-import io.jbotsim.Algorithms;
+import io.jbotsim.contrib.algos.Algorithms;
 import io.jbotsim.core.Link;
 import io.jbotsim.core.Node;
 import io.jbotsim.core.Properties;

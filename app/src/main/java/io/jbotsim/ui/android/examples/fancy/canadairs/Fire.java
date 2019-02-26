@@ -16,7 +16,7 @@ public class Fire extends Node {
         disableWireless();
         allFires.add(this);
         setIcon(Icon.getResourceURI(R.drawable.fire));
-        setSize(10);
+        setIconSize(10);
 	}
 	public void onClock(){
         if (PRNG.nextDouble() < 0.01)

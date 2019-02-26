@@ -20,7 +20,7 @@ public class Station extends Node {
 
     public Station() {
         setIcon(Icon.getResourceURI(R.drawable.station));
-        setSize(25);
+        setIconSize(25);
         setCommunicationRange(120);
     }
 

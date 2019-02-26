@@ -1,11 +1,11 @@
 package io.jbotsim.ui.android.examples.misc.dynamicgraphs;
 
-import io.jbotsim.Connectivity;
+import io.jbotsim.contrib.algos.Connectivity;
 import io.jbotsim.core.Node;
 import io.jbotsim.core.Topology;
 import io.jbotsim.core.event.ClockListener;
-import io.jbotsim.dynamicity.graph.EMEGPlayer;
-import io.jbotsim.dynamicity.graph.TVG;
+import io.jbotsim.gen.dynamic.graph.EMEGPlayer;
+import io.jbotsim.gen.dynamic.graph.TVG;
 import io.jbotsim.ui.android.AndroidViewerActivity;
 import io.jbotsim.ui.android.ViewerActivityInitializer;
 

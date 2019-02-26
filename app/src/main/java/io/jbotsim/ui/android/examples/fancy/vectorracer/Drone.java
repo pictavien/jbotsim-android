@@ -14,7 +14,7 @@ public class Drone extends VectorNode {
         super.onStart();
         setSensingRange(20);
         setIcon(Icon.getResourceURI(R.drawable.drone));
-        setSize(14);
+        setIconSize(14);
         onPointReached(getLocation());
     }
 

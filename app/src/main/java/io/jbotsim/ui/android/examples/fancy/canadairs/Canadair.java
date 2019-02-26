@@ -18,7 +18,7 @@ public class Canadair extends Node {
 
     public Canadair(){
         setIcon(Icon.getResourceURI(R.drawable.canadair));
-        setSize(18);
+        setIconSize(18);
         setCommunicationRange(120);
         setSensingRange(30);
     }

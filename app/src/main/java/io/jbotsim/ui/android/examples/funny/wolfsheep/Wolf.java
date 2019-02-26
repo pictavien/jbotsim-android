@@ -16,7 +16,7 @@ public class Wolf extends Node {
     @Override
     public void onStart() {
         setIcon(Icon.getResourceURI(R.drawable.wolf));
-        setSize(20);
+        setIconSize(20);
         setSensingRange(50);
         setDirection(PRNG.nextDouble() * Math.PI * 2);
     }

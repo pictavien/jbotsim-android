@@ -19,7 +19,7 @@ public class Sheep extends Node {
     @Override
     public void onStart() {
         setIcon(Icon.getResourceURI(R.drawable.sheep));
-        setSize(12);
+        setIconSize(12);
         setDirection(PRNG.nextDouble() * Math.PI * 2);
     }
 

@@ -17,19 +17,19 @@ import android.widget.Toast;
 
 import io.jbotsim.core.Topology;
 
-import io.jbotsim.core.io.FileManager;
-import io.jbotsim.serialization.dot.DotTopologySerializer;
+import io.jbotsim.io.FileManager;
+import io.jbotsim.io.format.dot.DotTopologySerializer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import io.jbotsim.serialization.TopologySerializerFilenameMatcher;
-import io.jbotsim.serialization.TopologySerializer;
+import io.jbotsim.io.format.TopologySerializerFilenameMatcher;
+import io.jbotsim.io.TopologySerializer;
 
-import io.jbotsim.serialization.plain.PlainTopologySerializer;
-import io.jbotsim.serialization.xml.XMLParser;
-import io.jbotsim.serialization.xml.XMLTopologySerializer;
+import io.jbotsim.io.format.plain.PlainTopologySerializer;
+import io.jbotsim.io.format.xml.XMLParser;
+import io.jbotsim.io.format.xml.XMLTopologySerializer;
 import io.jbotsim.ui.CommandListener;
 
 public class AndroidViewerActivity
@@ -67,7 +67,6 @@ public class AndroidViewerActivity
     }
 
     public AndroidViewerActivity(Topology topology) {
-        System.setProperty(XMLParser.VALIDATE_DOCUMENT_PROPERTY, "false");
         setTopology(topology);
     }
 
@@ -85,7 +84,7 @@ public class AndroidViewerActivity
         topology_ = topology;
         topology_.setFileManager(new AndroidFileAccessor(this));
         topology_.setClockModel(AndroidClock.class);
-        topology_.setTopologySerializer(new XMLTopologySerializer());
+        topology_.setSerializer(new XMLTopologySerializer(false));
         if(controller != null) {
             controller.setTopology(topology_);
             controller.resetPainters();
@@ -432,7 +431,7 @@ public class AndroidViewerActivity
 
     private static TopologySerializerFilenameMatcher getConfiguredTopologyFileNameMatcher() {
         TopologySerializerFilenameMatcher filenameMatcher = new TopologySerializerFilenameMatcher();
-        filenameMatcher.addTopologySerializer(".*\\.xml$",new XMLTopologySerializer());
+        filenameMatcher.addTopologySerializer(".*\\.xml$",new XMLTopologySerializer(false));
         filenameMatcher.addTopologySerializer(".*\\.plain$",new PlainTopologySerializer());
         filenameMatcher.addTopologySerializer(".*\\.xdot$",new DotTopologySerializer());
         filenameMatcher.addTopologySerializer(".*\\.dot$",new DotTopologySerializer());

@@ -21,7 +21,7 @@ public class Sensor extends Node {
 
     public Sensor() {
         setIcon(Icon.getResourceURI(R.drawable.sensor));
-        setSize(16);
+        setIconSize(16);
         setCommunicationRange(120);
         setSensingRange(60);
         onStart();

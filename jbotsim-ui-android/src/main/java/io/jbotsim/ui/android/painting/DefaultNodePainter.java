@@ -3,6 +3,7 @@ package io.jbotsim.ui.android.painting;
 import android.graphics.*;
 
 import io.jbotsim.core.Node;
+import io.jbotsim.io.FileManager;
 import io.jbotsim.ui.painting.NodePainter;
 import io.jbotsim.ui.painting.UIComponent;
 
@@ -12,8 +13,9 @@ import java.util.HashMap;
 
 public class DefaultNodePainter implements NodePainter {
     public static final String NODE_ICON_BITMAP_PROPERTY = "icon-bitmap";
-    public static final String DEFAULT_NODE_ICON = "/io/jbotsim/ui/default-node-icon.png";
+    public static final String DEFAULT_NODE_ICON = "/io/jbotsim/ui/icons/default-node-icon.png";
     private static final HashMap<String, Bitmap> bmpCache = new HashMap<>();
+    private static Bitmap defaultIcon = null;
 
     @Override
     public void paintNode(UIComponent g2d, Node node) {
@@ -27,14 +29,14 @@ public class DefaultNodePainter implements NodePainter {
             Paint np = new Paint();
             Matrix mat = new Matrix();
             float degrees = (float) (180.0 * (node.getDirection() - Node.DEFAULT_DIRECTION) / Math.PI);
-            float size = 2.0f * node.getSize();
+            float size = 2.0f * node.getIconSize();
             float sx = size / bmp.getWidth();
             float sy = size / bmp.getHeight();
             mat.postScale(sx, sy);
             mat.postRotate(degrees);
             bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), mat, true);
-            float x = (float) (node.getX() - bmp.getWidth()/2);
-            float y = (float) (node.getY() - bmp.getHeight()/2);
+            float x = (float) (node.getX() - bmp.getWidth() / 2);
+            float y = (float) (node.getY() - bmp.getHeight() / 2);
             canvas.drawBitmap(bmp, x, y, np);
         }
 
@@ -42,7 +44,7 @@ public class DefaultNodePainter implements NodePainter {
             Paint nP = new Paint();
             nP.setColor(node.getColor().getRGB());
             nP.setStyle(Paint.Style.FILL_AND_STROKE);
-            double radius = node.getSize();
+            double radius = node.getIconSize();
             float l = (float) (node.getX() - radius);
             float t = (float) (node.getY() - radius);
             float r = (float) (node.getX() + radius);
@@ -58,22 +60,35 @@ public class DefaultNodePainter implements NodePainter {
             return result;
 
         try {
+            FileManager fm = node.getTopology().getFileManager();
             String iconLoc = node.getIcon();
             if (iconLoc == null)
-                iconLoc = DEFAULT_NODE_ICON;
+                return getDefaultIcon(fm);
 
-            if(bmpCache.containsKey(iconLoc)) {
+            if (bmpCache.containsKey(iconLoc)) {
                 result = bmpCache.get(iconLoc);
             } else {
-                InputStream inputStream = node.getTopology().getFileManager().getInputStreamForName(iconLoc);
+                InputStream inputStream = fm.getInputStreamForName(iconLoc);
                 result = BitmapFactory.decodeStream(inputStream, null, null);
                 bmpCache.put(iconLoc, result);
             }
             node.setProperty(DefaultNodePainter.NODE_ICON_BITMAP_PROPERTY, result);
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
         return result;
+    }
+
+    private synchronized Bitmap getDefaultIcon(FileManager fm) {
+        if (defaultIcon == null) {
+            try {
+                InputStream inputStream = fm.getInputStreamForName(DEFAULT_NODE_ICON);
+                defaultIcon = BitmapFactory.decodeStream(inputStream, null, null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return defaultIcon;
     }
 }
