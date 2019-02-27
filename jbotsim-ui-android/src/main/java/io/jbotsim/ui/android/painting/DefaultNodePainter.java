@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 public class DefaultNodePainter implements NodePainter {
+    public static final double CIRCLE_RATIO = 0.5;
     public static final String NODE_ICON_BITMAP_PROPERTY = "icon-bitmap";
     public static final String DEFAULT_NODE_ICON = "/io/jbotsim/ui/icons/default-node-icon.png";
     private static final HashMap<String, Bitmap> bmpCache = new HashMap<>();
@@ -44,7 +45,7 @@ public class DefaultNodePainter implements NodePainter {
             Paint nP = new Paint();
             nP.setColor(node.getColor().getRGB());
             nP.setStyle(Paint.Style.FILL_AND_STROKE);
-            double radius = node.getIconSize();
+            double radius = node.getIconSize() * CIRCLE_RATIO;
             float l = (float) (node.getX() - radius);
             float t = (float) (node.getY() - radius);
             float r = (float) (node.getX() + radius);
