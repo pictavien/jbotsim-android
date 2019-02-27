@@ -394,7 +394,7 @@ public class AndroidViewerActivity
             shortToast("Unsupported file format");
         } else {
             String fileContent = getTopology().getFileManager().read(uri.toString());
-            ts.importTopology(getTopology(), fileContent);
+            ts.importFromString(getTopology(), fileContent);
             shortToast("Loading " + uri.getPath());
             setupSimulationButtons();
         }
@@ -414,7 +414,7 @@ public class AndroidViewerActivity
             tp.pause();
 
         TopologySerializer ts = getConfiguredTopologyFileNameMatcher().getTopologySerializerFor(uri.getPath());
-        String fileContent = ts.exportTopology(tp);
+        String fileContent = ts.exportToString(tp);
         FileManager fm = tp.getFileManager();
         fm.write(uri.toString(), fileContent);
         shortToast("Topology stored in "+ uri);

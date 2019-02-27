@@ -5,8 +5,7 @@ import io.jbotsim.core.Node;
 
 import io.jbotsim.core.Color;
 import io.jbotsim.core.Point;
-import io.jbotsim.ui.android.examples.R;
-import io.jbotsim.ui.android.utils.Icon;
+import io.jbotsim.ui.android.examples.Icons;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +19,7 @@ public class Sensor extends Node {
     int lastReceivedTime;
 
     public Sensor() {
-        setIcon(Icon.getResourceURI(R.drawable.sensor));
+        setIcon(Icons.SENSOR);
         setIconSize(16);
         setCommunicationRange(120);
         setSensingRange(60);

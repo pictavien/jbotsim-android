@@ -5,8 +5,7 @@ import io.jbotsim.core.Topology;
 
 import java.util.Random;
 
-import io.jbotsim.ui.android.examples.R;
-import io.jbotsim.ui.android.utils.Icon;
+import io.jbotsim.ui.android.examples.Icons;
 
 /**
  * Created by acasteig on 31/08/16.
@@ -18,7 +17,7 @@ public class Sheep extends Node {
 
     @Override
     public void onStart() {
-        setIcon(Icon.getResourceURI(R.drawable.sheep));
+        setIcon(Icons.SHEEP);
         setIconSize(12);
         setDirection(PRNG.nextDouble() * Math.PI * 2);
     }

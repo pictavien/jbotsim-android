@@ -13,7 +13,7 @@ buildscript {
 
 allprojects {
     ext.jbotsimGroup = "io.jbotsim"
-    ext.jbotsimVersion = '1.0.0-rc.01'
+    ext.jbotsimVersion = '1.0.0-rc.03'
     //ext.jbotsimVersion = '1.0-test-SNAPSHOT'
 
     repositories {
@@ -22,7 +22,7 @@ allprojects {
         maven {
             name = "Sonatype"
             //url = "https://oss.sonatype.org/content/repositories/snapshots/"
-            url =  "https://oss.sonatype.org/content/repositories/iojbotsim-1010/"
+            url =  "https://oss.sonatype.org/content/repositories/iojbotsim-1014/"
         }
         mavenCentral()
         google()

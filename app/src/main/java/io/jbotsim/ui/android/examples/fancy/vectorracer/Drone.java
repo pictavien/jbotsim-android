@@ -3,8 +3,7 @@ package io.jbotsim.ui.android.examples.fancy.vectorracer;
 import io.jbotsim.core.Node;
 
 import io.jbotsim.core.Point;
-import io.jbotsim.ui.android.examples.R;
-import io.jbotsim.ui.android.utils.Icon;
+import io.jbotsim.ui.android.examples.Icons;
 
 public class Drone extends VectorNode {
     Point nextCherry;
@@ -13,7 +12,7 @@ public class Drone extends VectorNode {
     public void onStart() {
         super.onStart();
         setSensingRange(20);
-        setIcon(Icon.getResourceURI(R.drawable.drone));
+        setIcon(Icons.DRONE);
         setIconSize(14);
         onPointReached(getLocation());
     }
