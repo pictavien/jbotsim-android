@@ -22,15 +22,13 @@ import io.jbotsim.io.format.dot.DotTopologySerializer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import io.jbotsim.io.format.TopologySerializerFilenameMatcher;
 import io.jbotsim.io.TopologySerializer;
 
 import io.jbotsim.io.format.plain.PlainTopologySerializer;
-import io.jbotsim.io.format.xml.XMLParser;
 import io.jbotsim.io.format.xml.XMLTopologySerializer;
-import io.jbotsim.ui.CommandListener;
+import io.jbotsim.core.event.CommandListener;
 
 public class AndroidViewerActivity
         extends Activity
@@ -60,7 +58,6 @@ public class AndroidViewerActivity
     private HashMap<SeekBarMode, Drawable> bmpCache = new HashMap<>();
 
     protected ArrayList<CommandListener> commandListeners = new ArrayList<>();
-    protected ArrayList<String> commands = new ArrayList<>();
 
     public AndroidViewerActivity() {
         this(new Topology());
@@ -82,6 +79,7 @@ public class AndroidViewerActivity
         }
 
         topology_ = topology;
+        topology_.disableDefaultCommands();
         topology_.setFileManager(new AndroidFileAccessor(this));
         topology_.setClockModel(AndroidClock.class);
         topology_.setSerializer(new XMLTopologySerializer(false));
@@ -221,7 +219,7 @@ public class AndroidViewerActivity
                         break;
                     case CLOCKSPEED:
                         if (SEEKBAR_MAX_PERIOD - progress > 0)
-                            getTopology().setClockSpeed(SEEKBAR_MAX_PERIOD - progress);
+                            getTopology().setTimeUnit(SEEKBAR_MAX_PERIOD - progress);
                         break;
                     case COMM_RANGE:
                         getTopology().setCommunicationRange(progress);
@@ -259,7 +257,7 @@ public class AndroidViewerActivity
                 maxvalue = Math.max(tp.getWidth(), tp.getHeight());
                 break;
             case CLOCKSPEED:
-                value = SEEKBAR_MAX_PERIOD - tp.getClockSpeed();
+                value = SEEKBAR_MAX_PERIOD - tp.getTimeUnit();
                 maxvalue = SEEKBAR_MAX_PERIOD - 1;
                 break;
             case COMM_RANGE:
@@ -300,23 +298,20 @@ public class AndroidViewerActivity
         MenuItem mi = menu.findItem(R.id.commandmenu);
         Menu commandsMenu = mi.getSubMenu();
         commandsMenu.clear();
-        for (String c : commands) {
+        Topology tp = getTopology();
+        for (String c : tp.getCommands()) {
+            if (Topology.COMMAND_SEPARATOR.equals(c))
+                continue;
             MenuItem mic = commandsMenu.add(c);
             mic.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
-                    notifyCommandListeners(item.getTitle().toString());
+                    tp.executeCommand(item.getTitle().toString());
                     return true;
                 }
             });
         }
         return true;
-    }
-
-    protected void notifyCommandListeners(String command) {
-        for (CommandListener cl : commandListeners) {
-            cl.onCommand(command);
-        }
     }
 
     public void shortToast(String toast) {
@@ -436,52 +431,5 @@ public class AndroidViewerActivity
         filenameMatcher.addTopologySerializer(".*\\.xdot$",new DotTopologySerializer());
         filenameMatcher.addTopologySerializer(".*\\.dot$",new DotTopologySerializer());
         return filenameMatcher;
-    }
-
-    /**
-     * Registers the specified action listener to this JTopology.
-     *
-     * @param al The listener to add.
-     */
-    public void addCommandListener(CommandListener al) {
-        commandListeners.add(al);
-    }
-
-    /**
-     * Unregisters the specified action listener to this JTopology.
-     *
-     * @param al The listener to remove.
-     */
-    public void removeCommandListener(CommandListener al) {
-        commandListeners.remove(al);
-    }
-
-    /**
-     * Adds the specified action command to this JTopology.
-     *
-     * @param command The command name to add.
-     */
-    public void addCommand(String command) {
-        commands.add(command);
-    }
-
-    public List<String> getCommands() {
-        return commands.subList(0, commands.size() - 1);
-    }
-
-    /**
-     * Removes the specified action command from this JTopology.
-     *
-     * @param command The command name to remove.
-     */
-    public void removeCommand(String command) {
-        commands.remove(command);
-    }
-
-    /**
-     * Removes all commands from this JTopology.
-     */
-    public void removeAllCommands() {
-        commands.clear();
     }
 }
