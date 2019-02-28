@@ -9,7 +9,7 @@ import io.jbotsim.ui.android.TopologyInitializer;
 public class EdgeMarkovian implements TopologyInitializer {
     @Override
     public boolean initialize(Topology tp) {
-        tp.setClockSpeed(100);
+        tp.setTimeUnit(100);
         TVG tvg = new TVG(Node.class);
         tvg.buildCompleteGraph(10);
         (new EMEGPlayer(tvg, tp, .02, .6)).start();

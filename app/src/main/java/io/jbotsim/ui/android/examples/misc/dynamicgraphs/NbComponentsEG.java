@@ -16,7 +16,7 @@ public class NbComponentsEG implements ViewerActivityInitializer {
         TVG tvg = new TVG(Node.class);
         tvg.buildCompleteGraph(12);
         Topology tp = activity.getTopology();
-        tp.setClockSpeed(100);
+        tp.setTimeUnit(100);
 
         (new EMEGPlayer(tvg, tp, .05, .6)).start();
         tp.addClockListener(new ClockListener() {

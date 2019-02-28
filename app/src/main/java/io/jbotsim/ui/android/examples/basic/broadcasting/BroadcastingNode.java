@@ -38,7 +38,7 @@ public class BroadcastingNode extends Node {
         @Override
         public boolean initialize(Topology topology) {
             topology.setDefaultNodeModel(BroadcastingNode.class);
-            topology.setClockSpeed(500);
+            topology.setTimeUnit(500);
 
             for (int i = 0; i < 7; i++){
                 for (int j = 0; j < 5; j++) {

@@ -14,7 +14,7 @@ public class AngularForcesExample implements TopologyInitializer  {
         Forces.Dth=tp.getCommunicationRange()*0.851;
         tp.setSensingRange(Forces.Dth / 2);
         tp.setDefaultNodeModel(Robot.class);
-        tp.setClockSpeed(6);
+        tp.setTimeUnit(6);
 
         return true;
     }

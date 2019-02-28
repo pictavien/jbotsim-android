@@ -28,9 +28,9 @@ public class CanadairsExample extends LinkResolver implements TopologyInitialize
         topology.addNode(50, 400, new Station());
         for (Link link : topology.getLinks())
             link.setColor(Color.gray);
+        topology.addNode(50, 50, new Lake());
         topology.addNode(50, 500, new Canadair());
         topology.addNode(100, 500, new Canadair());
-        topology.addNode(50, 50, new Lake());
     }
 
     @Override
@@ -39,7 +39,7 @@ public class CanadairsExample extends LinkResolver implements TopologyInitialize
         topology.setLinkResolver(this);
         topology.getMessageEngine().setSpeed(10);
         createMap(topology);
-        topology.setClockSpeed(30);
+        topology.setTimeUnit(30);
         topology.setDefaultNodeModel(Fire.class);
         return true;
     }

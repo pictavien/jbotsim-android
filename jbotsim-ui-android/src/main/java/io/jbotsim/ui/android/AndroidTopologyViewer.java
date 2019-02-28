@@ -409,7 +409,7 @@ public class AndroidTopologyViewer
 
     public void updateStatus() {
         statusInfo = "SR : " + tp.getSensingRange() + " CR : " + tp.getCommunicationRange() +
-                " CS : " + tp.getClockSpeed() + "\n" +
+                " CS : " + tp.getTimeUnit() + "\n" +
                 " # node : " + tp.getNodes().size() + " # nb links: " + tp.getLinks().size() +
                 " # time: " + tp.getTime();
     }

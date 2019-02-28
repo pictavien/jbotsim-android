@@ -18,7 +18,7 @@ public class SoccerExample implements  BackgroundPainter, ViewerActivityInitiali
         int unit = 6;
         Topology tp = activity.getTopology();
         tp.setDimensions(105 * unit+200, 68*unit+200);
-        tp.setClockSpeed(50);
+        tp.setTimeUnit(50);
         tp.addNode(100, 100, new Ball());
         tp.setDefaultNodeModel(Robot.class);
         activity.getViewer().addBackgroundPainter(this);

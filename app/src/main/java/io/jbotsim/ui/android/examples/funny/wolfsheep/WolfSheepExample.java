@@ -7,7 +7,7 @@ public class WolfSheepExample implements TopologyInitializer {
     @Override
     public boolean initialize(Topology tp) {
         tp.setDimensions (800, 600);
-        tp.setClockSpeed(20);
+        tp.setTimeUnit(20);
         tp.setDefaultNodeModel(Wolf.class);
         tp.disableWireless();
         tp.pause();
