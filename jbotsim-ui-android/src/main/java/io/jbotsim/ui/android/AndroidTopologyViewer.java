@@ -553,6 +553,7 @@ public class AndroidTopologyViewer
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     String modelName = models.get(position);
                     getTopology().addNode(x, y, getTopology().newInstanceOfModel(modelName));
+                    redraw();
                     popupModels.dismiss();
                 }
             });
