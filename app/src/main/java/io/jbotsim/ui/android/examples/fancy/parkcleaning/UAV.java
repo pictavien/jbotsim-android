@@ -1,7 +1,7 @@
 package io.jbotsim.ui.android.examples.fancy.parkcleaning;
 
 import io.jbotsim.core.Node;
-import io.jbotsim.ui.android.examples.Icons;
+import io.jbotsim.ui.icons.Icons;
 
 public class UAV extends Node {
 	public UAV(){

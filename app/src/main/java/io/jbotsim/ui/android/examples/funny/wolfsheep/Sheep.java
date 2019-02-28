@@ -2,10 +2,9 @@ package io.jbotsim.ui.android.examples.funny.wolfsheep;
 
 import io.jbotsim.core.Node;
 import io.jbotsim.core.Topology;
+import io.jbotsim.ui.icons.Icons;
 
 import java.util.Random;
-
-import io.jbotsim.ui.android.examples.Icons;
 
 /**
  * Created by acasteig on 31/08/16.

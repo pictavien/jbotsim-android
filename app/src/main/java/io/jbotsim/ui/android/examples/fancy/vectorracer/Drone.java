@@ -3,7 +3,7 @@ package io.jbotsim.ui.android.examples.fancy.vectorracer;
 import io.jbotsim.core.Node;
 
 import io.jbotsim.core.Point;
-import io.jbotsim.ui.android.examples.Icons;
+import io.jbotsim.ui.icons.Icons;
 
 public class Drone extends VectorNode {
     Point nextCherry;

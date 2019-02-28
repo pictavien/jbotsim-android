@@ -4,7 +4,7 @@ import io.jbotsim.core.Message;
 import io.jbotsim.core.Node;
 
 import io.jbotsim.core.Point;
-import io.jbotsim.ui.android.examples.Icons;
+import io.jbotsim.ui.icons.Icons;
 
 import java.util.*;
 

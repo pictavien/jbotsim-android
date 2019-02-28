@@ -1,7 +1,7 @@
 package io.jbotsim.ui.android.examples.fancy.vectorracer;
 
 import io.jbotsim.core.Node;
-import io.jbotsim.ui.android.examples.Icons;
+import io.jbotsim.ui.icons.Icons;
 
 /**
  * Created by acasteig on 18/11/16.
