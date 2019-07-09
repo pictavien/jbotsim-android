@@ -48,7 +48,7 @@ public class MultiAggregation implements TopologyListener, ConnectivityListener,
 	}
 	public void onLinkRemoved(Link l) {
 	}
-	public void onMove(Node n) {
+	public void onMovement(Node n) {
 		updateTrees();
 	}
 

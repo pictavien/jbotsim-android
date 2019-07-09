@@ -426,27 +426,33 @@ public class AndroidTopologyViewer
         canvas.drawText(clientInfo,0, -5*fontMetrics.top/2, onDrawPaint);
     }
 
+    @Override
     public void onNodeAdded(Node n) {
         n.addPropertyListener(this);
     }
 
+    @Override
     public void onNodeRemoved(Node n) {
         redraw();
     }
 
+    @Override
     public void onLinkAdded(Link l) {
         l.addPropertyListener(this);
         redraw();
     }
 
+    @Override
     public void onLinkRemoved(Link l) {
         redraw();
     }
 
-    public void onMove(Node n) {
+    @Override
+    public void onMovement(Node node) {
         redraw();
     }
 
+    @Override
     public void onPropertyChanged(Properties o, String property) {
         if (o instanceof Node) {
             Node n = (Node) o;
