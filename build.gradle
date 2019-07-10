@@ -15,18 +15,18 @@ allprojects {
     ext.jbotsimGroup = "io.jbotsim"
     ext.jbotsimVersion = '1.0.0'
     
-    //ext.jbotsimVersion = '1.0-test-SNAPSHOT'
+    //ext.jbotsimVersion = '1.0.0-dev-SNAPSHOT'
 
     repositories {
         mavenLocal()
 
-        maven {
-            name = "Sonatype"
-            //url = "https://oss.sonatype.org/content/repositories/snapshots/"
-            url =  "https://oss.sonatype.org/content/repositories/iojbotsim-1020/"
-
-        }
         mavenCentral()
+
+        maven {
+           name = "Sonatype"
+           url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+
         google()
         jcenter()
     }
