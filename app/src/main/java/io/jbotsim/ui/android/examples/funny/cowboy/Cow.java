@@ -1,15 +1,15 @@
 package io.jbotsim.ui.android.examples.funny.cowboy;
 
 import io.jbotsim.core.Node;
+import io.jbotsim.ui.android.AndroidFileAccessor;
 import io.jbotsim.ui.android.examples.R;
-import io.jbotsim.ui.android.utils.Icon;
 
 public class Cow extends Node {
     static Node farmer;
     int speed = 0;
 
     public Cow(){
-        setIcon(Icon.getResourceURI(R.drawable.cow));
+        setIcon(AndroidFileAccessor.getResourceURI(R.drawable.cow));
         setIconSize(30);
         disableWireless();
     }

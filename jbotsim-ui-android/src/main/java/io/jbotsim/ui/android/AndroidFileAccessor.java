@@ -38,6 +38,10 @@ public class AndroidFileAccessor
                 Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
     }
 
+    public static String getResourceURI(int resid) {
+        return "res:" + resid;
+    }
+
     @Override
     public InputStream getInputStreamForName(String s) throws IOException {
         int i = s.indexOf(':');

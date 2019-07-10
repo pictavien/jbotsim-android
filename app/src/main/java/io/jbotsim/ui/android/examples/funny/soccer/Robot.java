@@ -1,8 +1,7 @@
 package io.jbotsim.ui.android.examples.funny.soccer;
 
 import io.jbotsim.core.Node;
-import io.jbotsim.ui.android.examples.R;
-import io.jbotsim.ui.android.utils.Icon;
+import io.jbotsim.ui.icons.Icons;
 
 import java.util.Random;
 
@@ -15,7 +14,7 @@ public class Robot extends Node {
     @Override
     public void onStart() {
         setIconSize(14);
-        setIcon(Icon.getResourceURI(R.drawable.soccer_robot));
+        setIcon(Icons.ROBOT);
         setDirection(PRNG.nextDouble()*Math.PI*2.0);
         setSensingRange(getIconSize()+10);
     }

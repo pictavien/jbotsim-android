@@ -4,6 +4,7 @@ import android.graphics.*;
 
 import io.jbotsim.core.Node;
 import io.jbotsim.io.FileManager;
+import io.jbotsim.ui.icons.Icons;
 import io.jbotsim.ui.painting.NodePainter;
 import io.jbotsim.ui.painting.UIComponent;
 
@@ -14,7 +15,7 @@ import java.util.HashMap;
 public class DefaultNodePainter implements NodePainter {
     public static final double CIRCLE_RATIO = 0.5;
     public static final String NODE_ICON_BITMAP_PROPERTY = "icon-bitmap";
-    public static final String DEFAULT_NODE_ICON = "/io/jbotsim/ui/icons/default-node-icon.png";
+    public static final String DEFAULT_NODE_ICON = Icons.DEFAULT_NODE_ICON;
     private static final HashMap<String, Bitmap> bmpCache = new HashMap<>();
     private static Bitmap defaultIcon = null;
 
