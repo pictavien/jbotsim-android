@@ -1,1 +1,1 @@
-include ':app', ':jbotsim-ui-android'
+include ':demo', ':jbotsim-ui-android'
