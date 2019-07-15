@@ -20,7 +20,6 @@ import io.jbotsim.core.Topology;
 import io.jbotsim.io.FileManager;
 import io.jbotsim.io.format.dot.DotTopologySerializer;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import io.jbotsim.io.format.TopologySerializerFilenameMatcher;
@@ -28,7 +27,6 @@ import io.jbotsim.io.TopologySerializer;
 
 import io.jbotsim.io.format.plain.PlainTopologySerializer;
 import io.jbotsim.io.format.xml.XMLTopologySerializer;
-import io.jbotsim.core.event.CommandListener;
 
 public class AndroidViewerActivity
         extends Activity
@@ -56,8 +54,6 @@ public class AndroidViewerActivity
     private SeekBar seekBar = null;
     private SeekBarMode seekBarMode;
     private HashMap<SeekBarMode, Drawable> bmpCache = new HashMap<>();
-
-    protected ArrayList<CommandListener> commandListeners = new ArrayList<>();
 
     public AndroidViewerActivity() {
         this(new Topology());

@@ -43,7 +43,6 @@
             android:id="@+id/seekbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:thumb="@drawable/nodeicon"
             android:visibility="invisible" />
 
     </LinearLayout>
