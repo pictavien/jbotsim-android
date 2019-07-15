@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          package="io.jbotsim.ui.android.simpleviewer">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <application
+            android:enabled="true"
+            android:icon="@drawable/tv"
+            android:label="@string/app_name"
+            android:allowBackup="false"
+            tools:ignore="GoogleAppIndexingWarning">
+
+        <activity android:name=".SimpleViewerActivity"
+                  android:configChanges="orientation|screenSize"> <!-- prevent the topology to be reset after
+                                                                       the rotation of the screen -->
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
