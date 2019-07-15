@@ -748,7 +748,7 @@ public class AndroidTopologyViewer
     }
 
     private class DeleteIcon {
-        private final Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.trash64x64);
+        private final Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.trash);
         private RectF loc = new RectF();
         private boolean isOver = false;
         private boolean visible = false;
