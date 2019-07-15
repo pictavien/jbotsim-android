@@ -430,6 +430,8 @@ public class AndroidViewerActivity
         filenameMatcher.addTopologySerializer(".*\\.plain$",new PlainTopologySerializer());
         filenameMatcher.addTopologySerializer(".*\\.xdot$",new DotTopologySerializer());
         filenameMatcher.addTopologySerializer(".*\\.dot$",new DotTopologySerializer());
+        filenameMatcher.addTopologySerializer(".*$",new XMLTopologySerializer(false));
+
         return filenameMatcher;
     }
 }
