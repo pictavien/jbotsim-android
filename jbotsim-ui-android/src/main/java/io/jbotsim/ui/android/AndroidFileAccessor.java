@@ -39,7 +39,7 @@ public class AndroidFileAccessor
     }
 
     public static String getResourceURI(int resid) {
-        return "res:" + resid;
+        return RESOURCE_PREFIX+ ":" + resid;
     }
 
     @Override
