@@ -1,4 +1,4 @@
-![Build Status](https://travis-ci.org/pictavien/jbotsim-android.svg?branch=develop)
+![Build Status](https://travis-ci.org/pictavien/jbotsim-android.svg?branch=master)
 ![License](https://img.shields.io/badge/license-LGPL%20&ge;%203.0-informational.svg)
 
 # Android port of [JBotSim](http://jbotsim.io) library
