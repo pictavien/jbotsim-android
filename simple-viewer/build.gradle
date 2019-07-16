@@ -1,0 +1,6 @@
+apply plugin: 'com.android.application'
+apply from: project.COMMON_GRADLE
+
+dependencies {
+    implementation project(':jbotsim-ui-android')
+}
