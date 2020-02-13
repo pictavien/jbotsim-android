@@ -1,12 +1,7 @@
 package io.jbotsim.ui.android.examples.fancy.canadairs;
 
+import io.jbotsim.core.*;
 import io.jbotsim.ui.android.TopologyInitializer;
-import io.jbotsim.core.Link;
-import io.jbotsim.core.Node;
-import io.jbotsim.core.Topology;
-import io.jbotsim.core.LinkResolver;
-
-import io.jbotsim.core.Color;
 
 /**
  * Created by acasteig on 22/03/15.
@@ -37,7 +32,9 @@ public class CanadairsExample extends LinkResolver implements TopologyInitialize
     public boolean initialize(Topology topology) {
         topology.setDimensions(800,600);
         topology.setLinkResolver(this);
-        topology.getMessageEngine().setSpeed(10);
+        
+        topology.setMessageEngine(new DelayMessageEngine(topology, 10));
+
         createMap(topology);
         topology.setTimeUnit(30);
         topology.setDefaultNodeModel(Fire.class);

@@ -7,7 +7,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:3.5.0'
     }
 }
 
@@ -19,7 +19,7 @@ ext {
     JAVA_SOURCE_COMPATIBILITY = JavaVersion.VERSION_1_8
     JAVA_TARGET_COMPATIBILITY = JavaVersion.VERSION_1_8
     JBOTSIM_GROUP = "io.jbotsim"
-    JBOTSIM_VERSION = '1.0.0'
+    JBOTSIM_VERSION = '1.2.0'
     
     COMMON_GRADLE = "${rootDir}/common.gradle"
 }

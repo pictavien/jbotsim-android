@@ -26,7 +26,7 @@ public class DefaultLinkPainter implements LinkPainter {
         float dstY = (float) link.destination.getY();
         canvas.drawLine(srcX, srcY, dstX, dstY, edgePaint);
         Topology topology = link.source.getTopology();
-        if (topology != null && topology.hasDirectedLinks()) {
+        if (topology != null && topology.isDirected()) {
             float x = (srcX + 4 * dstX) / 5;
             float y = (srcY + 4 * dstY) / 5;
             canvas.drawCircle(x, y, 2, edgePaint);
